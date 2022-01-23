@@ -14,6 +14,7 @@ const Buyer = require("../../models/Buyer");
 const Vendor = require("../../models/Vendor");
 const User = require("../../models/User");
 
+const { ObjectId } = require("mongodb");
 // @route POST api/users/register
 // @desc Register users
 // @access Public
@@ -138,4 +139,12 @@ router.post("/login", (req, res) => {
   });
 });
 
+router.post("/getUser", (req, res) => {
+  User.findById(ObjectId(req.body.id)).then((user) => {
+    if (!user) {
+      return res.status(400).json({ email: "User not found" });
+    }
+    return res.json(user);
+  });
+});
 module.exports = router;
