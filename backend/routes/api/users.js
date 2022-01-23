@@ -103,7 +103,7 @@ router.post("/login", (req, res) => {
   User.findOne({ email }).then((user) => {
     // Check if user exists
     if (!user) {
-      return res.status(404).json({ emailnotfound: "Email not found" });
+      return res.status(400).json({ email: "Email not found" });
     } // Check password
     bcrypt.compare(password, user.password).then((isMatch) => {
       if (isMatch) {
@@ -125,14 +125,14 @@ router.post("/login", (req, res) => {
           (err, token) => {
             res.json({
               success: true,
+              role: user.role,
+              id: user._id,
               token: "Bearer " + token,
             });
           }
         );
       } else {
-        return res
-          .status(400)
-          .json({ passwordincorrect: "Password incorrect" });
+        return res.status(400).json({ password: "Password incorrect" });
       }
     });
   });

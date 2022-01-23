@@ -41,7 +41,7 @@ export default function Details(prop) {
       axios
         .post("/api/users/register", newVendor)
         .then((res) => {
-          navigate("/vendor");
+          navigate("/vendor/" + res._id);
         })
         .catch((err) => {
           setError(JSON.parse(err.request.response));
@@ -61,7 +61,7 @@ export default function Details(prop) {
       axios
         .post("/api/users/register", newBuyer)
         .then((res) => {
-          navigate("/buyer");
+          navigate("/buyer/" + res._id);
         })
         .catch((err) => {
           setError(JSON.parse(err.request.response));
@@ -77,7 +77,6 @@ export default function Details(prop) {
   const handleChange = (event) => {
     setBatch(event.target.value);
   };
-  console.log(error);
   return (
     <Container component="main" maxWidth="xs">
       <Box

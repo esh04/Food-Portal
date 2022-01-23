@@ -1,39 +1,56 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-// import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { Link } from "react-router-dom";
+import * as React from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { Link, useNavigate } from "react-router-dom";
+import Alert from "@mui/material/Alert";
+import axios from "axios";
 
 export default function SignIn() {
+  const [error, setError] = React.useState({});
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const newUser = {
+      email: data.get("email"),
+      password: data.get("password"),
+    };
+    axios
+      .post("/api/users/login", newUser)
+      .then((res) => {
+        console.log(res);
+        if (res.data.role == "vendor") {
+          navigate("/vendor/" + res.data.id);
+        } else if (res.data.role == "buyer") {
+          navigate("/buyer/" + res.data.id);
+        }
+      })
+      .catch((err) => {
+        console.log(err.request.response);
+        setError(JSON.parse(err.request.response));
+      });
   };
 
   return (
     <Container component="main" maxWidth="xs">
-    <Box
+      <Box
         sx={{
-        marginTop: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
-    >
+      >
         <Typography component="h1" variant="h5">
-        Sign in
+          Sign in
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-        <TextField
+          <TextField
             margin="normal"
             required
             fullWidth
@@ -42,8 +59,8 @@ export default function SignIn() {
             name="email"
             autoComplete="email"
             autoFocus
-        />
-        <TextField
+          />
+          <TextField
             margin="normal"
             required
             fullWidth
@@ -52,25 +69,29 @@ export default function SignIn() {
             type="password"
             id="password"
             autoComplete="current-password"
-        />
+          />
+          {(error.email || error.password) && (
+            <Alert color="error">
+              {error.email}
+              {error.password}
+            </Alert>
+          )}
 
-        <Button
+          <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-        >
+          >
             Sign In
-        </Button>
-        <Grid container>
+          </Button>
+          <Grid container>
             <Grid item>
-            <Link to="/register">
-                {"Don't have an account? Sign Up"}
-            </Link>
+              <Link to="/register">{"Don't have an account? Sign Up"}</Link>
             </Grid>
-        </Grid>
+          </Grid>
         </Box>
-    </Box>
+      </Box>
     </Container>
   );
 }
