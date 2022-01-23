@@ -30,10 +30,10 @@ const VendorSchema = new Schema({
 
   },
   
-  password: {
-    type: String,
-    required: true,
-  },
+  // password: {
+  //   type: String,
+  //   required: true,
+  // },
   openTime: {
     type: Date,
     required: true

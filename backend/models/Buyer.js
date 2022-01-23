@@ -32,10 +32,10 @@ const BuyerSchema = new Schema({
     required: true,
 
   },
-  password: {
-    type: String,
-    required: true,
-  },
+  // password: {
+  //   type: String,
+  //   required: true,
+  // },
   batch: {
     type: String,
     // enum: {
@@ -43,7 +43,11 @@ const BuyerSchema = new Schema({
     //     message: '{VALUE} is not supported'
     //   },
     // required: true
-  }
+  },
+  wallet: {
+    type: Number,
+    default: 0,
+  },
 }
 );
 

@@ -4,15 +4,13 @@
     "description": "Create a Food Portal for the IIIT Vendors",
     "main": "server.js",
     "scripts": {
-        "frontend-install": "npm install --prefix frontend",
         "start": "node server.js",
-        "server": "nodemon server.js",
-        "frontend": "npm start --prefix frontend",
-        "dev": "concurrently \"npm run server\" \"npm run frontend\""
+        "server": "nodemon server.js"   
     },
     "author": "Eshika Khandelwal",
     "license": "MIT",
     "dependencies": {
+        "axios": "^0.25.0",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.1",
         "concurrently": "^7.0.0",
