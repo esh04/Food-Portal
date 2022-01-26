@@ -8,6 +8,8 @@ const keys = require("../../config/keys");
 const validateRegisterInputBuyer = require("../../validation/register-buyer");
 const validateRegisterInputVendor = require("../../validation/register-vendor");
 const validateLoginInput = require("../../validation/login");
+const validateEditVendor = require("../../validation/edit-vendor");
+const validateEditBuyer = require("../../validation/edit-buyer");
 
 // Load models
 const Buyer = require("../../models/Buyer");
@@ -142,9 +144,67 @@ router.post("/login", (req, res) => {
 router.post("/getUser", (req, res) => {
   User.findById(ObjectId(req.body.id)).then((user) => {
     if (!user) {
-      return res.status(400).json({ email: "User not found" });
+      return res.status(400).json({ user: "User not found" });
+    } else {
+      if (user.role == "vendor") {
+        Vendor.findOne({ email: user.email }).then((vendor) => {
+          const user = { details: vendor, role: "vendor" };
+          return res.json(user);
+        });
+      } else if (user.role == "buyer") {
+        Buyer.findOne({ email: user.email }).then((buyer) => {
+          const user = { details: buyer, role: "buyer" };
+          return res.json(user);
+        });
+      }
     }
-    return res.json(user);
   });
 });
+
+router.post("/edit", (req, res) => {
+  if (req.body.role == "vendor") {
+    console.log("here");
+
+    Vendor.findOne({ email: req.body.email }).then((vendor) => {
+      if (!vendor) {
+        return res.status(400).json({ email: "Email not found" });
+      }
+      const { errors, isValid } = validateEditVendor(req.body);
+      if (!isValid) {
+        return res.status(400).json(errors);
+      }
+
+      vendor.managerName = req.body.managerName;
+      vendor.shopName = req.body.shopName;
+      vendor.contact = req.body.contact;
+      vendor.openTime = req.body.openTime;
+      vendor.closeTime = req.body.closeTime;
+      vendor
+        .save()
+        .then((vendor) => res.json(vendor))
+        .catch((err) => res.status(400).json(err));
+    });
+  } else if (req.body.role == "buyer") {
+    Buyer.findOne({ email: req.body.email }).then((buyer) => {
+      if (!buyer) {
+        return res.status(400).json({ email: "Email not found" });
+      }
+      const { errors, isValid } = validateEditBuyer(req.body);
+      if (!isValid) {
+        return res.status(400).json(errors);
+      }
+
+      buyer.managerName = req.body.managerName;
+      buyer.shopName = req.body.shopName;
+      buyer.contact = req.body.contact;
+      buyer.openTime = req.body.openTime;
+      buyer.closeTime = req.body.closeTime;
+      buyer
+        .save()
+        .then((buyer) => res.json(buyer))
+        .catch((err) => res.status(400).json(err));
+    });
+  }
+});
+
 module.exports = router;

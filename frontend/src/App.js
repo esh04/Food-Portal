@@ -3,7 +3,6 @@ import * as React from "react";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 
 // importing components from react-router package
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -39,21 +38,6 @@ function App() {
           <Route path="/profile/:id" element={<Profile />} />
         </Routes>
       </Router>
-      {/* Footer */}
-      <Box sx={{ bgcolor: "background.paper", p: 6 }} component="footer">
-        <Typography variant="h6" align="center" gutterBottom>
-          {/* Footer */}
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          color="text.secondary"
-          component="p"
-        >
-          Developed by Eshika Khandelwal
-        </Typography>
-      </Box>
-      {/* End footer */}
     </>
   );
 }

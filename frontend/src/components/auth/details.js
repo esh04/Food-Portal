@@ -35,13 +35,14 @@ export default function Details(prop) {
         contact: data.get("contact"),
         shopName: data.get("shopName"),
         managerName: data.get("managerName"),
-        closingTime: closeTime,
-        openingTime: openTime,
+        closeTime: closeTime,
+        openTime: openTime,
       };
+
       axios
         .post("/api/users/register", newVendor)
         .then((res) => {
-          navigate("/vendor/" + res._id);
+          navigate("/vendor/" + res.data._id);
         })
         .catch((err) => {
           setError(JSON.parse(err.request.response));
@@ -61,7 +62,8 @@ export default function Details(prop) {
       axios
         .post("/api/users/register", newBuyer)
         .then((res) => {
-          navigate("/buyer/" + res._id);
+          console.log(res);
+          navigate("/buyer/" + res.data._id);
         })
         .catch((err) => {
           setError(JSON.parse(err.request.response));
@@ -73,7 +75,6 @@ export default function Details(prop) {
   const [batch, setBatch] = React.useState("");
   const [closeTime, setCloseTime] = React.useState(null);
   const [openTime, setOpenTime] = React.useState(null);
-
   const handleChange = (event) => {
     setBatch(event.target.value);
   };

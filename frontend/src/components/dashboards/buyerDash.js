@@ -7,18 +7,15 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Grid from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
 import Select from "react-select";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import { FormLabel } from "@mui/material";
 import ToggleButton from "@mui/material/ToggleButton";
-import { color } from "@mui/system";
 
 const cards = ["hello", "hi", "wassup", "mef", "hef"];
 const options = [
@@ -74,7 +71,7 @@ export default function BuyerDashboard() {
         />
 
         <Grid container>
-          <Grid xs={12} sm={8} md={10}>
+          <Grid item xs={12} sm={8} md={10}>
             <Grid container sx={{ paddingBottom: 5 }}>
               <Grid>
                 <FormLabel>Tags</FormLabel>
@@ -178,7 +175,7 @@ export default function BuyerDashboard() {
             </Container>
           </Grid>
 
-          <Grid xs={12} sm={4} md={2} sx={{ paddingTop: 2 }}>
+          <Grid item xs={12} sm={4} md={2} sx={{ paddingTop: 2 }}>
             <Grid>
               <Button variant="contained">My Orders</Button>
               <Button

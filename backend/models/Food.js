@@ -15,7 +15,7 @@ const FoodSchema = new Schema({
     default: 0,
   },
   veg: {
-    type: Boolean,
+    type: String,
   },
   addOns: {
     type: Array,

@@ -17,39 +17,36 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
+import Alert from "@mui/material/Alert";
 
-const cards = ["hello", "hi", "wassup", "mef", "hef"];
-const options = [
-  { value: "chocolate", label: "Chocolate" },
-  { value: "strawberry", label: "Strawberry" },
-  { value: "vanilla", label: "Vanilla" },
-];
-
-let addOns = [];
 let tags = [];
+let addOns = [];
 
 export default function BuyerDashboard(prop) {
   let { id } = useParams();
-  const [userDetails, setUserDetails] = React.useState({});
+  const [userFood, setUserFood] = React.useState([]);
   const [addOnPrice, setAddOnPrice] = React.useState();
   const [addOnName, setAddOnName] = React.useState("");
   const [showAdd, setShowAdd] = React.useState(false);
   const [tag, setTag] = React.useState("");
   const [error, setError] = React.useState({});
+  const [errorFood, setErrorFood] = React.useState("");
+  const [errorTag, setErrorTag] = React.useState("");
+  const [errorUser, setErrorUser] = React.useState("");
+  const [errorAddOn, setErrorAddOn] = React.useState("");
 
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    axios
-      .post("/api/users/getUser", { id: id })
-      .then((res) => {
-        // console.log(res.data);
-        setUserDetails(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [id]);
+  // React.useEffect(() => {
+  //   axios
+  //     .post("/api/food/getFood", { id: id })
+  //     .then((res) => {
+  //       setUserFood(res.data);
+  //     })
+  //     .catch((err) => {
+  //       setErrorFood(JSON.parse(err.request.response));
+  //     });
+  // }, [id]);
 
   const handleNewItem = (event) => {
     event.preventDefault();
@@ -63,13 +60,14 @@ export default function BuyerDashboard(prop) {
       tags: tags,
       vendorID: id,
     };
+    console.log(newFoodItem);
     axios
-      .post("/api/users/addFood", newFoodItem)
+      .post("http://localhost:5000/api/food/addFood", newFoodItem)
       .then((res) => {
         navigate("/vendor/" + res._id);
       })
       .catch((err) => {
-        setError(JSON.parse(err.request.response));
+        setError(err.request.response);
       });
   };
   return (
@@ -87,7 +85,7 @@ export default function BuyerDashboard(prop) {
         {/* <Container> */}
 
         <Grid container>
-          <Grid xs={12} sm={8} md={10}>
+          <Grid item xs={12} sm={8} md={10}>
             <Grid container>
               <Button
                 variant="contained"
@@ -116,6 +114,8 @@ export default function BuyerDashboard(prop) {
                         name="name"
                       />
                     </Grid>
+                    {error.name && <Alert color="error">{error.name}</Alert>}
+
                     <Grid item xs={12}>
                       <TextField
                         required
@@ -126,6 +126,7 @@ export default function BuyerDashboard(prop) {
                         name="price"
                       />
                     </Grid>
+                    {error.price && <Alert color="error">{error.price}</Alert>}
 
                     <Grid item xs={12}>
                       <TextField
@@ -139,14 +140,20 @@ export default function BuyerDashboard(prop) {
                       />
                       <Button
                         onClick={() => {
-                          tags.push(tag);
-                          setTag("");
+                          if (tag == null || tag == "") {
+                            return setErrorTag("Tag field is empty");
+                          } else {
+                            tags.push(tag);
+                            setTag("");
+                          }
                         }}
                         variant="outlined"
                         sx={{ mt: 3, mb: 2 }}
                       >
                         Add Tag
                       </Button>
+                      {errorTag && <Alert color="error">{errorTag}</Alert>}
+
                       <Grid>
                         <Typography>
                           {tags.map((tag) => (
@@ -203,15 +210,29 @@ export default function BuyerDashboard(prop) {
                       </Grid>
                       <Button
                         onClick={() => {
-                          addOns.push({ name: addOnName, price: addOnPrice });
-                          setAddOnPrice(0);
-                          setAddOnName("");
+                          if (addOnName == null || addOnName == "") {
+                            return setErrorAddOn("Name field is required");
+                          } else if (addOnPrice == null || addOnPrice == "") {
+                            return setErrorAddOn("Price field is required");
+                          } else if (addOnPrice <= 0)
+                            return setErrorAddOn(
+                              "Price must be greater than 0"
+                            );
+                          else if (!addOnPrice.match(["[0-9]+"]))
+                            return setErrorAddOn("Invalid Price");
+                          else {
+                            addOns.push({ name: addOnName, price: addOnPrice });
+                            setAddOnPrice(0);
+                            setAddOnName("");
+                          }
                         }}
                         variant="outlined"
                         sx={{ mt: 3, mb: 2 }}
                       >
                         Add Add On
                       </Button>
+                      {errorAddOn && <Alert color="error">{errorAddOn}</Alert>}
+
                       <Grid>
                         <Typography>
                           {addOns.map((addOn) => (
@@ -236,30 +257,51 @@ export default function BuyerDashboard(prop) {
             ) : (
               <Container>
                 <Grid container spacing={4}>
-                  {cards.map((card) => (
+                  {errorUser && <Alert color="error">{errorUser}</Alert>}
+                  {errorFood && <Alert color="error">{errorFood}</Alert>}
+
+                  {userFood.map((card) => (
                     <Grid item key={card} xs={12} sm={6} md={3}>
                       <Card>
-                        {/* <CardMedia
-                    component="img"
-                    sx={{
-                      // 16:9
-                      pt: "56.25%",
-                    }}
-                    image="https://source.unsplash.com/random"
-                    alt="random"
-                  /> */}
                         <CardContent>
                           <Typography gutterBottom variant="h5" component="h2">
                             Heading {card}
                           </Typography>
-
-                          <Typography>Price:</Typography>
-                          <Typography>Vendor:</Typography>
+                          <Typography>Name : {card.name}</Typography>
+                          <Typography>Price : {card.price}</Typography>
+                          <Typography>Rating : {card.rating}</Typography>
+                          <Typography>{card.veg}</Typography>
+                          <Typography>
+                            {card.addOns.map((addOn) => (
+                              <li>
+                                {addOn.name} {addOn.price}
+                              </li>
+                            ))}
+                          </Typography>
+                          <Typography>
+                            {card.tags.map((tag) => (
+                              <li>{tag}</li>
+                            ))}
+                          </Typography>
                         </CardContent>
                         <CardActions>
                           <Grid container>
                             <Button variant="contained">Edit</Button>
-                            <Button variant="outlined">Delete</Button>
+                            <Button
+                              variant="outlined"
+                              onClick={() => {
+                                axios
+                                  .post("/api/users/deleteFood", id)
+                                  .then((res) => {
+                                    navigate("/vendor/" + res._id);
+                                  })
+                                  .catch((err) => {
+                                    setError(JSON.parse(err.request.response));
+                                  });
+                              }}
+                            >
+                              Delete
+                            </Button>
                           </Grid>
                         </CardActions>
                       </Card>
@@ -270,7 +312,7 @@ export default function BuyerDashboard(prop) {
             )}
           </Grid>
 
-          <Grid xs={12} sm={4} md={2} sx={{ paddingTop: 2 }}>
+          <Grid item xs={12} sm={4} md={2} sx={{ paddingTop: 2 }}>
             <Grid>
               <Button variant="contained">My Orders</Button>
               <Button
