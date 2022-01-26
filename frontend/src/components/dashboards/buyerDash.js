@@ -1,8 +1,6 @@
 import * as React from "react";
 import { useParams, useNavigate } from "react-router";
 import axios from "axios";
-// https://mui.com/getting-started/templates/album/
-
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -14,12 +12,31 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
+import Select from "react-select";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import TextField from "@mui/material/TextField";
+import { FormLabel } from "@mui/material";
+import ToggleButton from "@mui/material/ToggleButton";
+import { color } from "@mui/system";
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const cards = ["hello", "hi", "wassup", "mef", "hef"];
+const options = [
+  { value: "chocolate", label: "Chocolate" },
+  { value: "strawberry", label: "Strawberry" },
+  { value: "vanilla", label: "Vanilla" },
+];
 
-export default function BuyerDashboard(prop) {
+export default function BuyerDashboard() {
   let { id } = useParams();
+  const navigate = useNavigate();
+
   const [userDetails, setUserDetails] = React.useState({});
+  const [minPrice, setMinPrice] = React.useState(0);
+  const [maxPrice, setMaxPrice] = React.useState(0);
+  const [searchItem, setSearchItem] = React.useState("");
+  const [selected, setSelected] = React.useState(false);
+
   React.useEffect(() => {
     axios
       .post("/api/users/getUser", { id: id })
@@ -34,59 +51,78 @@ export default function BuyerDashboard(prop) {
 
   return (
     <>
-      <main>
-        {/* Hero unit */}
-        <Box
+      <Box
+        sx={{
+          marginTop: 3,
+          marginRight: 10,
+          marginLeft: 10,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {/* <Container> */}
+        <TextField
           sx={{
-            bgcolor: "background.paper",
-            pt: 8,
-            pb: 6,
+            marginBottom: 3,
           }}
-        >
-          <Container maxWidth="sm">
-            <Typography
-              component="h1"
-              variant="h2"
-              align="center"
-              color="text.primary"
-              gutterBottom
-            >
-              Album layout
-            </Typography>
-            <Typography
-              variant="h5"
-              align="center"
-              color="text.secondary"
-              paragraph
-            >
-              Something short and leading about the collection below—its
-              contents, the creator, etc. Make it short and sweet, but not too
-              short so folks don&apos;t simply skip over it entirely.
-            </Typography>
-            <Stack
-              sx={{ pt: 4 }}
-              direction="row"
-              spacing={2}
-              justifyContent="center"
-            >
-              <Button variant="contained">Main call to action</Button>
-              <Button variant="outlined">Secondary action</Button>
-            </Stack>
-          </Container>
-        </Box>
-        <Container sx={{ py: 8 }} maxWidth="md">
-          {/* End hero unit */}
-          <Grid container spacing={4}>
-            {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <CardMedia
+          fullWidth
+          id="searchItem"
+          value={searchItem}
+          label="Search Bar"
+          onChange={(e) => setSearchItem(e.target.value)}
+        />
+
+        <Grid container>
+          <Grid xs={12} sm={8} md={10}>
+            <Grid container sx={{ paddingBottom: 5 }}>
+              <Grid>
+                <FormLabel>Tags</FormLabel>
+                <Select isMulti options={options} />
+              </Grid>
+              <Grid sx={{ paddingLeft: 2 }}>
+                <FormLabel>Shop Names</FormLabel>
+                <Select isMulti options={options} />
+              </Grid>
+              <Grid sx={{ paddingLeft: 2 }}>
+                <FormControlLabel
+                  control={<Checkbox defaultChecked />}
+                  label="Veg"
+                />
+              </Grid>
+              <Grid>
+                <FormControlLabel
+                  control={<Checkbox defaultChecked />}
+                  label="Non Veg"
+                />
+              </Grid>
+              <Grid sx={{ paddingLeft: 2 }}>
+                <TextField
+                  required
+                  name="maxPrice"
+                  label="Max Price"
+                  type="number"
+                  id="maxPrice"
+                  onChange={(e) => setMaxPrice(e)}
+                />
+              </Grid>
+              <Grid sx={{ paddingLeft: 2 }}>
+                <TextField
+                  required
+                  name="minPrice"
+                  label="Min Price"
+                  type="number"
+                  id="minPrice"
+                  onChange={(e) => setMinPrice(e)}
+                />
+              </Grid>
+            </Grid>
+            <Container>
+              <Grid container spacing={4}>
+                {cards.map((card) => (
+                  <Grid item key={card} xs={12} sm={6} md={3}>
+                    <Card>
+                      {/* <CardMedia
                     component="img"
                     sx={{
                       // 16:9
@@ -94,26 +130,138 @@ export default function BuyerDashboard(prop) {
                     }}
                     image="https://source.unsplash.com/random"
                     alt="random"
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      Heading
-                    </Typography>
-                    <Typography>
-                      This is a media card. You can use this section to describe
-                      the content.
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small">View</Button>
-                    <Button size="small">Edit</Button>
-                  </CardActions>
-                </Card>
+                  /> */}
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="h2">
+                          Heading {card}
+                          <ToggleButton
+                            value="check"
+                            selected={selected}
+                            onChange={(e) => {
+                              setSelected(!selected);
+                              if (selected) {
+                                e.target.style.backgroundColor = "red";
+                              } else {
+                                e.target.style.backgroundColor = "white";
+                              }
+                            }}
+                          />
+                        </Typography>
+
+                        <Typography>Price:</Typography>
+                        <Typography>Vendor:</Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Grid container>
+                          <Grid>
+                            <TextField
+                              required
+                              size="small"
+                              name="quantity"
+                              label="Quantity"
+                              type="number"
+                              id="quantity"
+                            />
+                          </Grid>
+                        </Grid>
+                      </CardActions>
+                    </Card>
+                    <Grid sx={{ paddingTop: 2 }}>
+                      <Typography>Addons</Typography>
+
+                      <Select isMulti options={options} />
+                      <Button variant="contained">Buy</Button>
+                    </Grid>
+                  </Grid>
+                ))}
               </Grid>
-            ))}
+            </Container>
           </Grid>
-        </Container>
-      </main>
+
+          <Grid xs={12} sm={4} md={2} sx={{ paddingTop: 2 }}>
+            <Grid>
+              <Button variant="contained">My Orders</Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  navigate("/profile/" + id);
+                }}
+              >
+                My Profile
+              </Button>
+            </Grid>
+            <Card sx={{ paddingTop: 2 }}>
+              <CardContent>
+                <Typography variant="h4">Wallet</Typography>
+                <Grid>
+                  <TextField disabled value="0" name="wallet" />
+                </Grid>
+
+                <Grid>
+                  <TextField
+                    name="wallet"
+                    type="number"
+                    id="wallet"
+                    label="Add Money"
+                  />
+                </Grid>
+              </CardContent>
+              <CardActions>
+                <Button variant="contained">Add</Button>
+              </CardActions>
+            </Card>
+            <Grid sx={{ paddingTop: 5 }}>
+              <Typography variant="h4">Favourites</Typography>
+
+              <Grid container spacing={4}>
+                {cards.map((card) => (
+                  <Grid item key={card} sx={{ padding: 1 }}>
+                    <Card>
+                      {/* <CardMedia
+                    component="img"
+                    sx={{
+                      // 16:9
+                      pt: "56.25%",
+                    }}
+                    image="https://source.unsplash.com/random"
+                    alt="random"
+                  /> */}
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="h2">
+                          Heading {card}
+                        </Typography>
+                        <Typography>Price:</Typography>
+                        <Typography>Vendor:</Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Grid container>
+                          <Grid>
+                            <TextField
+                              required
+                              size="small"
+                              name="quantity"
+                              label="Quantity"
+                              type="number"
+                              id="quantity"
+                            />
+                          </Grid>
+                        </Grid>
+                      </CardActions>
+                    </Card>
+                    <Grid sx={{ paddingTop: 2 }}>
+                      <Typography>Addons</Typography>
+
+                      <Select isMulti options={options} />
+                      <Button variant="contained">Buy</Button>
+                    </Grid>
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Box>
+      {/* </Container> */}
     </>
   );
 }

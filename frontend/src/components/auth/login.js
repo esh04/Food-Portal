@@ -56,7 +56,6 @@ export default function SignIn() {
             id="email"
             label="Email Address"
             name="email"
-            autoComplete="email"
             autoFocus
           />
           <TextField
@@ -67,7 +66,6 @@ export default function SignIn() {
             label="Password"
             type="password"
             id="password"
-            autoComplete="current-password"
           />
           {(error.email || error.password) && (
             <Alert color="error">
