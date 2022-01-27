@@ -17,6 +17,9 @@ import VendorDashboard from "./components/dashboards/vendorDash";
 import BuyerDashboard from "./components/dashboards/buyerDash";
 // import Profile dashboard
 import Profile from "./components/dashboards/profileDash";
+import Stats from "./components/dashboards/stats";
+import OrderVendor from "./components/dashboards/order-vendor";
+import OrderBuyer from "./components/dashboards/order-buyer";
 
 function App() {
   return (
@@ -36,6 +39,9 @@ function App() {
           <Route path="/vendor" element={<VendorDashboard />} />
           <Route path="/buyer" element={<BuyerDashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/stats" element={<Stats />} />
+          <Route path="/order-vendor" element={<OrderVendor />} />
+          <Route path="/order-buyer" element={<OrderBuyer />} />
         </Routes>
       </Router>
     </>
