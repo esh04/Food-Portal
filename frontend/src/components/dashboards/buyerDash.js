@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useParams, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -25,7 +25,7 @@ const options = [
 ];
 
 export default function BuyerDashboard() {
-  let { id } = useParams();
+  let id = localStorage.getItem("userid");
   const navigate = useNavigate();
 
   const [userDetails, setUserDetails] = React.useState({});
@@ -38,7 +38,6 @@ export default function BuyerDashboard() {
     axios
       .post("/api/users/getUser", { id: id })
       .then((res) => {
-        // console.log(res.data);
         setUserDetails(res.data);
       })
       .catch((err) => {
@@ -181,7 +180,7 @@ export default function BuyerDashboard() {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  navigate("/profile/" + id);
+                  navigate("/profile");
                 }}
               >
                 My Profile

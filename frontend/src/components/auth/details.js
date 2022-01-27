@@ -42,7 +42,9 @@ export default function Details(prop) {
       axios
         .post("/api/users/register", newVendor)
         .then((res) => {
-          navigate("/vendor/" + res.data._id);
+          localStorage.setItem("userid", res.data.id);
+
+          navigate("/vendor");
         })
         .catch((err) => {
           setError(JSON.parse(err.request.response));
@@ -62,8 +64,8 @@ export default function Details(prop) {
       axios
         .post("/api/users/register", newBuyer)
         .then((res) => {
-          console.log(res);
-          navigate("/buyer/" + res.data._id);
+          localStorage.setItem("userid", res.data.id);
+          navigate("/buyer");
         })
         .catch((err) => {
           setError(JSON.parse(err.request.response));

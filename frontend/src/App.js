@@ -33,9 +33,9 @@ function App() {
           <Route exact path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/vendor/:id" element={<VendorDashboard />} />
-          <Route path="/buyer/:id" element={<BuyerDashboard />} />
-          <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/vendor" element={<VendorDashboard />} />
+          <Route path="/buyer" element={<BuyerDashboard />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </>

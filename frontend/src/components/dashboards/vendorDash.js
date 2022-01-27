@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useParams } from "react-router";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -23,7 +22,7 @@ let tags = [];
 let addOns = [];
 
 export default function BuyerDashboard(prop) {
-  let { id } = useParams();
+  let id = localStorage.getItem("userid");
   const [userFood, setUserFood] = React.useState([]);
   const [addOnPrice, setAddOnPrice] = React.useState();
   const [addOnName, setAddOnName] = React.useState("");
@@ -37,16 +36,16 @@ export default function BuyerDashboard(prop) {
 
   const navigate = useNavigate();
 
-  // React.useEffect(() => {
-  //   axios
-  //     .post("/api/food/getFood", { id: id })
-  //     .then((res) => {
-  //       setUserFood(res.data);
-  //     })
-  //     .catch((err) => {
-  //       setErrorFood(JSON.parse(err.request.response));
-  //     });
-  // }, [id]);
+  React.useEffect(() => {
+    axios
+      .post("/api/food/getFood", { id: id })
+      .then((res) => {
+        setUserFood(res.data);
+      })
+      .catch((err) => {
+        setErrorFood(JSON.parse(err.request.response));
+      });
+  }, [id, showAdd]);
 
   const handleNewItem = (event) => {
     event.preventDefault();
@@ -60,14 +59,13 @@ export default function BuyerDashboard(prop) {
       tags: tags,
       vendorID: id,
     };
-    console.log(newFoodItem);
     axios
       .post("http://localhost:5000/api/food/addFood", newFoodItem)
       .then((res) => {
-        navigate("/vendor/" + res._id);
+        setShowAdd(false);
       })
       .catch((err) => {
-        setError(err.request.response);
+        setError(err.request);
       });
   };
   return (
@@ -261,26 +259,26 @@ export default function BuyerDashboard(prop) {
                   {errorFood && <Alert color="error">{errorFood}</Alert>}
 
                   {userFood.map((card) => (
-                    <Grid item key={card} xs={12} sm={6} md={3}>
+                    <Grid item key={card._id} xs={12} sm={6} md={3}>
                       <Card>
                         <CardContent>
                           <Typography gutterBottom variant="h5" component="h2">
-                            Heading {card}
+                            {card.name}
                           </Typography>
                           <Typography>Name : {card.name}</Typography>
                           <Typography>Price : {card.price}</Typography>
                           <Typography>Rating : {card.rating}</Typography>
                           <Typography>{card.veg}</Typography>
                           <Typography>
-                            {card.addOns.map((addOn) => (
-                              <li>
+                            {card.addOns.map((addOn, index) => (
+                              <li key={index}>
                                 {addOn.name} {addOn.price}
                               </li>
                             ))}
                           </Typography>
                           <Typography>
-                            {card.tags.map((tag) => (
-                              <li>{tag}</li>
+                            {card.tags.map((tag, index) => (
+                              <li key={index}>{tag}</li>
                             ))}
                           </Typography>
                         </CardContent>
@@ -293,7 +291,7 @@ export default function BuyerDashboard(prop) {
                                 axios
                                   .post("/api/users/deleteFood", id)
                                   .then((res) => {
-                                    navigate("/vendor/" + res._id);
+                                    navigate("/vendor");
                                   })
                                   .catch((err) => {
                                     setError(JSON.parse(err.request.response));
@@ -318,7 +316,7 @@ export default function BuyerDashboard(prop) {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  navigate("/profile/" + id);
+                  navigate("/profile");
                 }}
               >
                 My Profile

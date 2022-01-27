@@ -12,9 +12,10 @@ const Buyer = require("../../models/Buyer");
 const { ObjectId } = require("mongodb");
 
 router.post("/addFood", (req, res) => {
-  console.log("here");
-  Food.findOne({ food: req.body.name, vendorID: req.body.vendorID }).then(
+  Food.findOne({ name: req.body.name, vendorID: req.body.vendorID }).then(
     (food) => {
+      console.log(food);
+
       if (food) {
         return res.status(400).json({ food: "Item already exists" });
       } else {
@@ -33,7 +34,10 @@ router.post("/addFood", (req, res) => {
           vendorID: req.body.vendorID,
         });
 
-        newFood.save().catch((err) => console.log(err));
+        newFood
+          .save()
+          .then((food) => res.json(food))
+          .catch((err) => console.log(err));
       }
     }
   );

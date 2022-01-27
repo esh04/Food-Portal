@@ -6,7 +6,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
-import { useParams } from "react-router";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
@@ -32,7 +31,7 @@ export default function Checkout() {
   const [age, setAge] = React.useState(20);
   const [name, setName] = React.useState("blah");
 
-  let { id } = useParams();
+  let id = localStorage.getItem("userid");
 
   const navigate = useNavigate();
 
@@ -205,8 +204,8 @@ export default function Checkout() {
         <Button
           variant="contained"
           onClick={() => {
-            if (role == "buyer") navigate("/buyer/" + id);
-            else navigate("/vendor/" + id);
+            if (role == "buyer") navigate("/buyer");
+            else navigate("/vendor");
           }}
         >
           Back

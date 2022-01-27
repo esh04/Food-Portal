@@ -35,7 +35,7 @@ export default function Checkout() {
   const [user, setUser] = React.useState({ details: "" });
   const [error, setError] = React.useState({});
 
-  let { id } = useParams();
+  let id = localStorage.getItem("userid");
 
   const navigate = useNavigate();
 
@@ -261,8 +261,8 @@ export default function Checkout() {
         <Button
           variant="contained"
           onClick={() => {
-            if (user.role == "buyer") navigate("/buyer/" + id);
-            else navigate("/vendor/" + id);
+            if (user.role == "buyer") navigate("/buyer");
+            else navigate("/vendor");
           }}
         >
           Back

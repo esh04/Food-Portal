@@ -5,6 +5,7 @@ const passport = require("passport");
 const users = require("./routes/api/users");
 const food = require("./routes/api/food");
 
+var cors = require("cors");
 const app = express();
 
 // Bodyparser middleware
@@ -15,7 +16,13 @@ app.use(
 );
 
 app.use(bodyParser.json());
-
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 // DB Config
 const db = require("./config/keys").mongoURI;
 

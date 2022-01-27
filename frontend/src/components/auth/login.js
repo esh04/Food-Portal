@@ -23,11 +23,11 @@ export default function SignIn() {
     axios
       .post("/api/users/login", newUser)
       .then((res) => {
-        console.log(res);
-        if (res.data.role == "vendor") {
-          navigate("/vendor/" + res.data.id);
-        } else if (res.data.role == "buyer") {
-          navigate("/buyer/" + res.data.id);
+        localStorage.setItem("userid", res.data.id);
+        if (res.data.role === "vendor") {
+          navigate("/vendor");
+        } else if (res.data.role === "buyer") {
+          navigate("/buyer");
         }
       })
       .catch((err) => {
