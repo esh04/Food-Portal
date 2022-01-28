@@ -165,7 +165,7 @@ export default function Checkout() {
                     variant="standard"
                     autoComplete="name"
                     onChange={(e) => {
-                      name(e.target.value);
+                      setName(e.target.value);
                     }}
                   />
                   {error.name && <Alert color="error">{error.name}</Alert>}
@@ -227,7 +227,7 @@ export default function Checkout() {
                         setAge(e.target.value);
                       }}
                     />
-                    {error.batch && <Alert color="error">{error.batch}</Alert>}
+                    {error.age && <Alert color="error">{error.age}</Alert>}
                   </Grid>
                 </>
               ) : (

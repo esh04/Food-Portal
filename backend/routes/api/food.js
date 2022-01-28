@@ -65,13 +65,12 @@ router.post("/editFood", (req, res) => {
   );
 });
 
-router.post("/deleteFood"),
-  (req, res) => {
-    Food.deleteOne({ _id: req.body._id }, function (err) {
-      if (err) return console.log(err);
-      return res.json({ success: true });
-    });
-  };
+router.post("/deleteFood", (req, res) => {
+  Food.deleteOne({ _id: req.body._id }, function (err) {
+    if (err) return console.log(err);
+    return res.json({ success: true });
+  });
+});
 
 router.post("/getFood", (req, res) => {
   Food.find({ vendorID: req.body.id }).then((food) => {
@@ -80,6 +79,16 @@ router.post("/getFood", (req, res) => {
     } else {
       return res.json(food);
     }
+  });
+});
+
+router.get("/displayFood", (res) => {
+  Food.find().then((food) => {
+    if (!food) {
+      return res.status(400).json({ display: "No items to display" });
+    }
+    console.log(food,typeof(food))
+    return res.json({display: "hi"});
   });
 });
 

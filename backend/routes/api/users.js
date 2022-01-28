@@ -194,11 +194,10 @@ router.post("/edit", (req, res) => {
         return res.status(400).json(errors);
       }
 
-      buyer.managerName = req.body.managerName;
-      buyer.shopName = req.body.shopName;
+      buyer.name = req.body.name;
+      buyer.batch = req.body.batch;
       buyer.contact = req.body.contact;
-      buyer.openTime = req.body.openTime;
-      buyer.closeTime = req.body.closeTime;
+      buyer.age = req.body.age;
       buyer
         .save()
         .then((buyer) => res.json(buyer))
