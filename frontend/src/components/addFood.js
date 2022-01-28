@@ -39,10 +39,12 @@ export default function BuyerDashboard(prop) {
     axios
       .post("http://localhost:5000/api/food/addFood", newFoodItem)
       .then((res) => {
+        tags = [];
+        addOns = [];
         prop.setShowAdd(false);
       })
       .catch((err) => {
-        setError(err.request);
+        setError(JSON.parse(err.request.response));
       });
   };
   return (
@@ -106,8 +108,8 @@ export default function BuyerDashboard(prop) {
 
               <Grid>
                 <Typography>
-                  {tags.map((tag) => (
-                    <li>{tag} </li>
+                  {tags.map((tag, index) => (
+                    <li key={index}>{tag} </li>
                   ))}
                 </Typography>
               </Grid>
@@ -179,8 +181,8 @@ export default function BuyerDashboard(prop) {
 
               <Grid>
                 <Typography>
-                  {addOns.map((addOn) => (
-                    <li>
+                  {addOns.map((addOn, index) => (
+                    <li key={index}>
                       {addOn.name} {addOn.price}
                     </li>
                   ))}

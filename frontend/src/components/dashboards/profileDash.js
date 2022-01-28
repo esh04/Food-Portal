@@ -1,12 +1,9 @@
 import * as React from "react";
-import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
-import { useParams } from "react-router";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
@@ -14,6 +11,7 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
+import Alert from "@mui/material/Alert";
 import FormHelperText from "@mui/material/FormHelperText";
 
 // for time
@@ -101,6 +99,7 @@ export default function Checkout() {
             <Typography component="h1" variant="h4" align="center">
               Profile
             </Typography>
+            {error.user && <Alert color="error">{error.user}</Alert>}
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormHelperText>Email</FormHelperText>
@@ -130,6 +129,9 @@ export default function Checkout() {
                         setManagerName(e.target.value);
                       }}
                     />
+                    {error.managerName && (
+                      <Alert color="error">{error.managerName}</Alert>
+                    )}
                   </Grid>
                   <Grid item xs={12}>
                     <FormHelperText>Shop Name</FormHelperText>
@@ -145,6 +147,9 @@ export default function Checkout() {
                         setShopName(e.target.value);
                       }}
                     />
+                    {error.shopName && (
+                      <Alert color="error">{error.shopName}</Alert>
+                    )}
                   </Grid>
                 </>
               ) : (
@@ -163,6 +168,7 @@ export default function Checkout() {
                       name(e.target.value);
                     }}
                   />
+                  {error.name && <Alert color="error">{error.name}</Alert>}
                 </Grid>
               )}
               <Grid item xs={12}>
@@ -179,6 +185,7 @@ export default function Checkout() {
                     setContact(e.target.value);
                   }}
                 />
+                {error.contact && <Alert color="error">{error.contact}</Alert>}
               </Grid>
               {user.role == "buyer" ? (
                 <>
@@ -220,6 +227,7 @@ export default function Checkout() {
                         setAge(e.target.value);
                       }}
                     />
+                    {error.batch && <Alert color="error">{error.batch}</Alert>}
                   </Grid>
                 </>
               ) : (
@@ -236,6 +244,9 @@ export default function Checkout() {
                         renderInput={(params) => <TextField {...params} />}
                       />
                     </LocalizationProvider>
+                    {error.openTime && (
+                      <Alert color="error">{error.openTime}</Alert>
+                    )}
                   </Grid>
                   <Grid item xs={12}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -249,6 +260,9 @@ export default function Checkout() {
                         renderInput={(params) => <TextField {...params} />}
                       />
                     </LocalizationProvider>
+                    {error.closeTime && (
+                      <Alert color="error">{error.closeTime}</Alert>
+                    )}
                   </Grid>
                 </>
               )}
