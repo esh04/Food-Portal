@@ -58,6 +58,7 @@ router.post("/register", (req, res) => {
           batch: req.body.batch,
           contact: req.body.contact,
           age: req.body.age,
+          wallet: 0,
         });
 
         newBuyer.save().catch((err) => console.log(err));
@@ -204,6 +205,17 @@ router.post("/edit", (req, res) => {
         .catch((err) => res.status(400).json(err));
     });
   }
+});
+
+router.post("/addMoney", (req, res) => {
+  Buyer.findOne({ email: req.body.email }).then((buyer) => {
+    if (!buyer) return res.status(400).json({ email: "buyer not found" });
+    buyer.wallet = buyer.wallet + parseInt(req.body.amount);
+    buyer
+      .save()
+      .then((buyer) => res.json(buyer))
+      .catch((err) => res.status(400).json(err));
+  });
 });
 
 module.exports = router;

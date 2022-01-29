@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useNavigate } from "react-router";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -7,38 +6,52 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Select from "react-select";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
-import { FormLabel } from "@mui/material";
-import ToggleButton from "@mui/material/ToggleButton";
 
-export default function BuyerDashboard(prop) {
+export default function Wallet({ userDetails }) {
+  const [walletAdd, setWalletAdd] = React.useState(0);
+  const [wallet, setWallet] = React.useState(userDetails.wallet);
+
+  const addMoney = (event) => {
+    axios
+      .post("/api/users/addMoney", {
+        email: userDetails.email,
+        amount: walletAdd,
+      })
+      .then((res) => {
+        setWalletAdd(0);
+        setWallet(res.data.wallet);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <Card sx={{ paddingTop: 2 }}>
-    <CardContent>
+      <CardContent>
         <Typography variant="h4">Wallet</Typography>
         <Grid>
-        <TextField disabled value="0" name="wallet" />
+          <TextField disabled value={wallet} name="wallet" />
         </Grid>
 
         <Grid>
-        <TextField
+          <TextField
             name="wallet"
             type="number"
             id="wallet"
             label="Add Money"
-        />
+            value={walletAdd}
+            onChange={(e) => setWalletAdd(e.target.value)}
+          />
         </Grid>
-    </CardContent>
-    <CardActions>
-        <Button variant="contained">Add</Button>
-    </CardActions>
+      </CardContent>
+      <CardActions>
+        <Button variant="contained" onClick={() => addMoney()}>
+          Add
+        </Button>
+      </CardActions>
     </Card>
-    
   );
 }

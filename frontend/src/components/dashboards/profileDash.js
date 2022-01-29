@@ -21,14 +21,14 @@ import TimePicker from "@mui/lab/TimePicker";
 
 import axios from "axios";
 
-export default function Checkout() {
+export default function Profile() {
   const [contact, setContact] = React.useState("");
   const [shopName, setShopName] = React.useState("");
   const [managerName, setManagerName] = React.useState("");
   const [openTime, setOpenTime] = React.useState(Date.now());
   const [closeTime, setCloseTime] = React.useState(Date.now());
   const [batch, setBatch] = React.useState("");
-  const [age, setAge] = React.useState(0);
+  const [age, setAge] = React.useState("");
   const [name, setName] = React.useState("");
   const [user, setUser] = React.useState({ details: "" });
   const [error, setError] = React.useState({});

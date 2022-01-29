@@ -59,7 +59,7 @@ const rows = [
   ),
 ];
 
-export default function Orders() {
+export default function OrderVendor() {
   const navigate = useNavigate();
   return (
     <Container>

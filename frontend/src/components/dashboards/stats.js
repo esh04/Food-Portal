@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 import { useNavigate } from "react-router-dom";
 import { Grid } from "@mui/material";
 
-export default function Orders() {
+export default function Stats() {
   const navigate = useNavigate();
   const rows = ["item1", "item2", "item3", "item4", "item5"];
   return (

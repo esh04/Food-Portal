@@ -94,7 +94,7 @@ const rows = [
   ),
 ];
 
-export default function Orders() {
+export default function OrderBuyer() {
   const navigate = useNavigate();
 
   return (

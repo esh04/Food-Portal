@@ -8,24 +8,35 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import EditItem from "./editFood";
 
-export default function BuyerDashboard(prop) {
+export default function FoodItem(prop) {
   let id = localStorage.getItem("userid");
   const [showEdit, setShowEdit] = React.useState(false);
-  const [error, setError] = React.useState({});
+  const [cardDetails, setCardDetails] = React.useState(prop.card);
+
+  React.useEffect(() => {
+    axios
+      .post("/api/food/getSingleFood", { id: id, foodId: cardDetails._id })
+      .then((res) => {
+        setCardDetails(res.data);
+      })
+      .catch((err) => {
+        console.log(JSON.parse(err.request.response));
+      });
+  }, [id, showEdit]);
 
   return (
     <Card>
       <CardContent>
         <Typography gutterBottom variant="h5" component="h2">
-          {prop.card.name}
+          {cardDetails.name}
         </Typography>
-        <Typography>Name : {prop.card.name}</Typography>
-        <Typography>Price : {prop.card.price}</Typography>
-        <Typography>Rating : {prop.card.rating}</Typography>
-        <Typography>{prop.card.veg}</Typography>
+        <Typography>Name : {cardDetails.name}</Typography>
+        <Typography>Price : {cardDetails.price}</Typography>
+        <Typography>Rating : {cardDetails.rating}</Typography>
+        <Typography>{cardDetails.veg}</Typography>
         <Typography>
           Add Ons:
-          {prop.card.addOns.map((addOn, index) => (
+          {cardDetails.addOns.map((addOn, index) => (
             <li key={index}>
               {addOn.name} {addOn.price}
             </li>
@@ -33,7 +44,7 @@ export default function BuyerDashboard(prop) {
         </Typography>
         <Typography>
           Tags:
-          {prop.card.tags.map((tag, index) => (
+          {cardDetails.tags.map((tag, index) => (
             <li key={index}>{tag}</li>
           ))}
         </Typography>
@@ -47,9 +58,9 @@ export default function BuyerDashboard(prop) {
             variant="outlined"
             onClick={() => {
               axios
-                .post("/api/food/deleteFood", prop.card)
-                .then((res) => {
-                  console.log("deleted");
+                .post("/api/food/deleteFood", cardDetails)
+                .then((response) => {
+                  prop.onDelete(cardDetails._id);
                 })
                 .catch((err) => {
                   console.log(err.request.response);
@@ -64,7 +75,7 @@ export default function BuyerDashboard(prop) {
         <EditItem
           showEdit={showEdit}
           setShowEdit={setShowEdit}
-          card={prop.card}
+          card={cardDetails}
         />
       )}
     </Card>

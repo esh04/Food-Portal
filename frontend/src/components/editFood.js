@@ -12,10 +12,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import Alert from "@mui/material/Alert";
 
-let tags = [];
-let addOns = [];
-
-export default function BuyerDashboard(prop) {
+export default function EditFood(prop) {
   let id = localStorage.getItem("userid");
   const [name, setName] = React.useState(prop.card.name);
   const [price, setPrice] = React.useState(prop.card.price);
@@ -23,9 +20,9 @@ export default function BuyerDashboard(prop) {
   const [tags, setTags] = React.useState(prop.card.tags);
   const [addOns, setAddOns] = React.useState(prop.card.addOns);
 
-  const [addOnPrice, setAddOnPrice] = React.useState();
+  const [addOnPrice, setAddOnPrice] = React.useState("");
   const [addOnName, setAddOnName] = React.useState("");
-  const [tag, setTag] = React.useState("");
+  const [tag, setTag] = React.useState([]);
   const [error, setError] = React.useState({});
   const [errorTag, setErrorTag] = React.useState("");
   const [errorName, setErrorName] = React.useState("");
@@ -46,7 +43,6 @@ export default function BuyerDashboard(prop) {
     axios
       .post("/api/food/editFood", newFoodItem)
       .then((res) => {
-        console.log(res.data);
         prop.setShowEdit(false);
       })
       .catch((err) => {
@@ -121,7 +117,15 @@ export default function BuyerDashboard(prop) {
               <Grid>
                 <Typography>
                   {tags.map((tag, index) => (
-                    <li key={index}>{tag} </li>
+                    <li key={index}>
+                      {tag}
+                      <Button
+                        color="error"
+                        onClick={() => setTags(tags.filter((e) => e !== tag))}
+                      >
+                        X
+                      </Button>
+                    </li>
                   ))}
                 </Typography>
               </Grid>
@@ -196,7 +200,15 @@ export default function BuyerDashboard(prop) {
                 <Typography>
                   {addOns.map((addOn, index) => (
                     <li key={index}>
-                      {addOn.name} {addOn.price}
+                      {addOn.name} - Rs. {addOn.price}
+                      <Button
+                        color="error"
+                        onClick={() =>
+                          setAddOns(addOns.filter((e) => e.name !== addOn.name))
+                        }
+                      >
+                        X
+                      </Button>
                     </li>
                   ))}
                 </Typography>

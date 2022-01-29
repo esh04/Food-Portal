@@ -9,7 +9,7 @@ import Alert from "@mui/material/Alert";
 import AddItem from "../addFood";
 import ItemCard from "../item-card";
 
-export default function BuyerDashboard(prop) {
+export default function VendorDashboard(prop) {
   let id = localStorage.getItem("userid");
   const [userFood, setUserFood] = React.useState([]);
   const [showAdd, setShowAdd] = React.useState(false);
@@ -27,6 +27,10 @@ export default function BuyerDashboard(prop) {
         setErrorFood(JSON.parse(err.request.response));
       });
   }, [id, showAdd]);
+
+  const onDelete = (foodId) => {
+    setUserFood(userFood.filter((userFood) => userFood._id !== foodId));
+  };
 
   return (
     <>
@@ -61,7 +65,7 @@ export default function BuyerDashboard(prop) {
               <Grid container spacing={4}>
                 {userFood.map((card) => (
                   <Grid item key={card._id} xs={12} sm={6} md={3}>
-                    <ItemCard card={card} />
+                    <ItemCard card={card} onDelete={onDelete} />
                   </Grid>
                 ))}
               </Grid>

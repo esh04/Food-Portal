@@ -17,7 +17,13 @@ const OrderSchema = new Schema({
     type: Array,
   },
   status: {
-    type: String,
+    type: Number,
+    // 0 placed
+    // 1 accepted
+    // 2 cooking
+    // 3 ready to pickup
+    // 4 completed
+    // 5 rejected
   },
 });
 

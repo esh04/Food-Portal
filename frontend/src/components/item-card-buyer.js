@@ -14,11 +14,16 @@ import Select from "react-select";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import { FormLabel } from "@mui/material";
-import ToggleButton from "@mui/material/ToggleButton";
 
-export default function ItemCard(prop) {
+export default function ItemCard({ card }) {
   const navigate = useNavigate();
+  const [addOns, setAddOns] = React.useState(
+    card.addOns.map((addOn) => {
+      return { value: addOn.name, label: addOn.name };
+    })
+  );
 
+  const buyItem = () => {};
   return (
     <>
       <Card>
@@ -33,10 +38,23 @@ export default function ItemCard(prop) {
                   /> */}
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-            Heading {prop.card}
+            {card.name}
           </Typography>
-          <Typography>Price:</Typography>
-          <Typography>Vendor:</Typography>
+          <Typography>Price: Rs {card.price}</Typography>
+          <Typography>Vendor: {card.vendorName}</Typography>
+          <Typography>
+            {card.veg === "veg" ? "Vegeterian" : "Non-Vegeterian"}
+          </Typography>
+          {card.tags?.length > 0 && (
+            <Typography>
+              <br />
+              <b>Tags:</b>
+            </Typography>
+          )}
+          {card.tags?.length > 0 &&
+            card.tags.map((tag, index) => (
+              <Typography key={index}>{tag}</Typography>
+            ))}
         </CardContent>
         <CardActions>
           <Grid container>
@@ -54,10 +72,15 @@ export default function ItemCard(prop) {
         </CardActions>
       </Card>
       <Grid sx={{ paddingTop: 2 }}>
-        <Typography>Addons</Typography>
-
-        <Select isMulti options={prop.options} />
-        <Button variant="contained">Buy</Button>
+        {card.addOns?.length > 0 && (
+          <>
+            <Typography>Addons</Typography>
+            <Select isMulti options={addOns} />
+          </>
+        )}
+        <Button variant="contained" onClick={() => buyItem()}>
+          Buy
+        </Button>
       </Grid>
     </>
   );

@@ -15,7 +15,7 @@ import Alert from "@mui/material/Alert";
 let tags = [];
 let addOns = [];
 
-export default function BuyerDashboard(prop) {
+export default function AddFood(prop) {
   let id = localStorage.getItem("userid");
   const [addOnPrice, setAddOnPrice] = React.useState();
   const [addOnName, setAddOnName] = React.useState("");

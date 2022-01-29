@@ -10,6 +10,7 @@ const Vendor = require("../../models/Vendor");
 const Buyer = require("../../models/Buyer");
 
 const { ObjectId } = require("mongodb");
+const Order = require("../../models/Order");
 
 router.post("/addFood", (req, res) => {
   Food.findOne({ name: req.body.name, vendorID: req.body.vendorID }).then(
@@ -47,9 +48,6 @@ router.post("/editFood", (req, res) => {
       if (!food) {
         return res.status(400).json({ food: "Item doesn't exists" });
       } else {
-        if (!isValid) {
-          return res.status(400).json(errors);
-        }
         food.name = req.body.name;
         food.price = req.body.price;
         food.rating = req.body.rating;
@@ -82,14 +80,72 @@ router.post("/getFood", (req, res) => {
   });
 });
 
-router.get("/displayFood", (res) => {
-  Food.find().then((food) => {
+router.post("/getSingleFood", (req, res) => {
+  Food.findOne({ _id: req.body.foodId, vendorID: req.body.id }).then((food) => {
+    if (!food) {
+      return res.status(400).json({ food: "Item doesn't exists" });
+    } else {
+      return res.json(food);
+    }
+  });
+});
+
+router.get("/displayFood", (req, res) => {
+  Food.find().then(async (food) => {
     if (!food) {
       return res.status(400).json({ display: "No items to display" });
     }
-    console.log(food,typeof(food))
-    return res.json({display: "hi"});
+
+    let tempFood = [];
+
+    await Promise.all(
+      food.map(async (foodItem, index) => {
+        const user = await User.findOne({ _id: ObjectId(foodItem.vendorID) });
+        const vendor = await Vendor.findOne({ email: user.email });
+        tempFood.push({
+          _id: foodItem._id,
+          name: foodItem.name,
+          price: foodItem.price,
+          rating: foodItem.rating,
+          veg: foodItem.veg,
+          addOns: foodItem.addOns,
+          tags: foodItem.tags,
+          vendorName: vendor.managerName,
+        });
+      })
+    );
+
+    return res.json(tempFood);
   });
+});
+
+router.checkout("/placeOrder", (req, res) => {
+  const newOrder = new Order({
+    quantity: req.body.quantity,
+    foodId: req.body.foodId,
+    buyerId: req.body.buyerId,
+    addOns: req.body.addOns,
+    status: 0,
+  });
+
+  newOrder.save().catch((err) => console.log(err));
+});
+
+router.checkout("/getOrders", (req, res) => {
+  if (req.body.role == "buyer") {
+    Order.findAll({ buyerId: req.body.id }).then((order) => {
+      if (!order) {
+        return res.status(400).json({ display: "No orders to display" });
+      }
+      return res.json(order);
+    });
+  }
+  // write for vendor
+});
+
+router.checkout("/stageChange", (req, res) => {
+  req.body.stage = req.body.stage + 1;
+  return res.json(req.body);
 });
 
 module.exports = router;

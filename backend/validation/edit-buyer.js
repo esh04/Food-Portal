@@ -25,10 +25,8 @@ module.exports = function validateRegisterInputBuyer(data) {
   }
 
   // Age check
-  if (Validator.isEmpty(data.age)) {
+  if (isEmpty(data.age)) {
     errors.age = "Age field is required";
-  } else if (!data.age.match("[0-9]+")) {
-    errors.age = "Age is invalid";
   } else if (data.age <= 0) {
     errors.age = "Age is invalid";
   }
