@@ -111,6 +111,9 @@ router.get("/displayFood", (req, res) => {
           addOns: foodItem.addOns,
           tags: foodItem.tags,
           vendorName: vendor.managerName,
+          vendorShopName: vendor.shopName,
+          vendorOpenTime: vendor.openTime,
+          vendorCloseTime: vendor.closeTime,
         });
       })
     );
@@ -119,19 +122,35 @@ router.get("/displayFood", (req, res) => {
   });
 });
 
-router.checkout("/placeOrder", (req, res) => {
-  const newOrder = new Order({
-    quantity: req.body.quantity,
-    foodId: req.body.foodId,
-    buyerId: req.body.buyerId,
-    addOns: req.body.addOns,
-    status: 0,
-  });
+router.post("/placeOrder", (req, res) => {
+  async () => {
+    const user = await User.findOne({ _id: ObjectId(req.body.buyerID) });
+    const buyer = await Buyer.findOne({ email: user.email });
 
-  newOrder.save().catch((err) => console.log(err));
+    if (parseInt(req.body.price <= buyer.wallet)) {
+      buyer.wallet = buyer.wallet - parseInt(req.body.price);
+      buyer
+        .save()
+        .then((buyer) => res.json(buyer))
+        .catch((err) => res.status(400).json(err));
+      console.log(buyer);
+    } else {
+      return res.status(400).json({ wallet: "Insufficient balance" });
+    }
+    const newOrder = new Order({
+      quantity: req.body.quantity,
+      foodId: req.body.foodId,
+      vendorID: req.body.vendorID,
+      addOns: req.body.addOns,
+      status: 0,
+    });
+
+    console.log(newOrder);
+    newOrder.save().catch((err) => console.log(err));
+  };
 });
 
-router.checkout("/getOrders", (req, res) => {
+router.post("/getOrders", (req, res) => {
   if (req.body.role == "buyer") {
     Order.findAll({ buyerId: req.body.id }).then((order) => {
       if (!order) {
@@ -143,7 +162,7 @@ router.checkout("/getOrders", (req, res) => {
   // write for vendor
 });
 
-router.checkout("/stageChange", (req, res) => {
+router.post("/stageChange", (req, res) => {
   req.body.stage = req.body.stage + 1;
   return res.json(req.body);
 });

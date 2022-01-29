@@ -14,18 +14,52 @@ import Select from "react-select";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import { FormLabel } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import moment from "moment";
 
 export default function ItemCard({ card }) {
   const navigate = useNavigate();
   const [addOns, setAddOns] = React.useState(
     card.addOns.map((addOn) => {
-      return { value: addOn.name, label: addOn.name };
+      return { value: addOn.price, label: addOn.name };
     })
   );
+  const [quantity, setQuantity] = React.useState(0);
+  const [error, setError] = React.useState({});
 
-  const buyItem = () => {};
+  const buyItem = () => {
+    if (quantity > 0) {
+      const totalPrice =
+        card.price +
+        addOns.reduce((acc, addOn) => {
+          return acc + addOn.value;
+        }, 0);
+
+      const newOrder = {
+        quantity: quantity,
+        foodId: card._id,
+        vendorID: card.vendorID,
+        addOns: addOns,
+        status: 0,
+        price: totalPrice,
+        buyerID: localStorage.getItem("userId"),
+      };
+      axios
+        .post("/api/food/placeOrder", newOrder)
+        .then((res) => {
+          setError({ success: "Order Placed Successfully" });
+        })
+        .catch((err) => {
+          setError(err.response);
+        });
+    } else setError({ quantity: "Invalid Quantity" });
+  };
   return (
     <>
+      {error.quantity && <Alert color="error">{error.quantity}</Alert>}
+      {error.wallet && <Alert color="error">{error.wallet}</Alert>}
+      {error.success && <Alert color="success">{error.success}</Alert>}
+
       <Card>
         {/* <CardMedia
                     component="img"
@@ -42,6 +76,13 @@ export default function ItemCard({ card }) {
           </Typography>
           <Typography>Price: Rs {card.price}</Typography>
           <Typography>Vendor: {card.vendorName}</Typography>
+          <Typography>Shop Name: {card.vendorShopName}</Typography>
+          <Typography>
+            Open Time: {moment(card.vendorOpenTime).format("LT")}
+          </Typography>
+          <Typography>
+            Close Time: {moment(card.vendorCloseTime).format("LT")}
+          </Typography>
           <Typography>
             {card.veg === "veg" ? "Vegeterian" : "Non-Vegeterian"}
           </Typography>
@@ -66,6 +107,8 @@ export default function ItemCard({ card }) {
                 label="Quantity"
                 type="number"
                 id="quantity"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
               />
             </Grid>
           </Grid>

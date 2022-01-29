@@ -22,6 +22,7 @@ export default function BuyerDashboard() {
     search: "",
     veg: ["veg", "nonveg"],
     tags: [],
+    shopNames: [],
     max: 999,
     min: 0,
     choice: "price",

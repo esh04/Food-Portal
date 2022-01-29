@@ -8,9 +8,9 @@ const OrderSchema = new Schema({
     type: Number,
   },
   foodId: {
-    type: Number,
+    type: String,
   },
-  buyerId: {
+  vendorID: {
     type: String,
   },
   addOns: {
