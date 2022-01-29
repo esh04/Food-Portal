@@ -115,11 +115,18 @@ export default function BuyerDashboard() {
             </Grid>
             <Grid item xs={12} sm={4} md={2} sx={{ paddingTop: 2 }}>
               <Grid>
-                <Button variant="contained">My Orders</Button>
+                <Button
+                  onClick={() => {
+                    navigate("/order-buyer");
+                  }}
+                  variant="contained"
+                >
+                  My Orders
+                </Button>
                 <Button
                   variant="outlined"
                   onClick={() => {
-                    navigate("/order-buyer");
+                    navigate("/buyer");
                   }}
                 >
                   My Profile

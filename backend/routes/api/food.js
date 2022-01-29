@@ -114,6 +114,7 @@ router.get("/displayFood", (req, res) => {
           vendorShopName: vendor.shopName,
           vendorOpenTime: vendor.openTime,
           vendorCloseTime: vendor.closeTime,
+          vendorID: user._id,
         });
       })
     );
@@ -123,7 +124,7 @@ router.get("/displayFood", (req, res) => {
 });
 
 router.post("/placeOrder", (req, res) => {
-  console.log(req.body);
+  console.log("bodddyyy", req.body);
   Buyer.findOne({ email: req.body.email }).then((buyer) => {
     if (req.body.price <= buyer.wallet) {
       console.log(req.body.price);
@@ -132,7 +133,6 @@ router.post("/placeOrder", (req, res) => {
         .save()
         .then((buyer) => res.json(buyer))
         .catch((err) => res.status(400).json(err));
-      console.log(buyer);
     } else {
       return res.status(400).json({ wallet: "Insufficient balance" });
     }
@@ -144,6 +144,7 @@ router.post("/placeOrder", (req, res) => {
       placedTime: Date.now(),
       status: 0,
       price: req.body.price,
+      buyerID: req.body.buyerID,
     });
 
     console.log(newOrder);
@@ -164,14 +165,10 @@ router.post("/getOrders", (req, res) => {
       if (!order) {
         return res.status(400).json({ display: "No orders to display" });
       }
+      console.log(order);
       return res.json(order);
     });
   }
-});
-
-router.post("/stageChange", (req, res) => {
-  req.body.stage = req.body.stage + 1;
-  return res.json(req.body);
 });
 
 module.exports = router;

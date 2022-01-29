@@ -31,6 +31,9 @@ const OrderSchema = new Schema({
   price: {
     type: Number,
   },
+  buyerID: {
+    type: String,
+  },
 });
 
 module.exports = Order = mongoose.model("order", OrderSchema);

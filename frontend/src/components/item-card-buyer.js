@@ -18,6 +18,7 @@ import Alert from "@mui/material/Alert";
 import moment from "moment";
 
 export default function ItemCard({ card, userDetails }) {
+  const id = localStorage.getItem("userid");
   const navigate = useNavigate();
   // const [time, setTime] = React.useState(Date.now());
   //
@@ -47,6 +48,7 @@ export default function ItemCard({ card, userDetails }) {
         status: 0,
         price: totalPrice,
         email: userDetails.email,
+        buyerID: id,
       };
       axios
         .post("/api/food/placeOrder", newOrder)
