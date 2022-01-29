@@ -4,6 +4,9 @@ const Schema = mongoose.Schema;
 // Create Schema
 
 const OrderSchema = new Schema({
+  placedTime: {
+    type: Date,
+  },
   quantity: {
     type: Number,
   },
@@ -24,6 +27,9 @@ const OrderSchema = new Schema({
     // 3 ready to pickup
     // 4 completed
     // 5 rejected
+  },
+  price: {
+    type: Number,
   },
 });
 

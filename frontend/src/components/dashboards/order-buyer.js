@@ -9,100 +9,41 @@ import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import Alert from "@mui/material/Alert";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
-// Generate Order Data
-function createData(
-  id,
-  placedTime,
-  vendorName,
-  foodItem,
-  quantity,
-  addOns,
-  status,
-  cost,
-  rating
-) {
-  return {
-    id,
-    placedTime,
-    vendorName,
-    foodItem,
-    quantity,
-    addOns,
-    status,
-    cost,
-    rating,
+export default function OrderBuyer({ userDetails }) {
+  const status = {
+    0: "Placed",
+    1: "Accepted",
+    2: "Cooking",
+    3: "Ready for Pickup",
+    4: "Completed",
+    5: "Rejected",
   };
-}
-
-const rows = [
-  createData(
-    0,
-    "16 Mar, 2019",
-    "Elvis Presley",
-    "Tupelo, MS",
-    "VISA ⠀•••• 3719",
-    312.44,
-    43,
-    43,
-    43
-  ),
-  createData(
-    1,
-    "16 Mar, 2019",
-    "Paul McCartney",
-    "London, UK",
-    43,
-    43,
-    43,
-    "VISA ⠀•••• 2574",
-    866.99
-  ),
-  createData(
-    2,
-    "16 Mar, 2019",
-    43,
-    43,
-    43,
-    "Tom Scholz",
-    "Boston, MA",
-    "MC ⠀•••• 1253",
-    100.81
-  ),
-  createData(
-    3,
-    "16 Mar, 2019",
-    "Michael Jackson",
-    "Gary, IN",
-    43,
-    43,
-    43,
-    "AMEX ⠀•••• 2000",
-    654.39
-  ),
-  createData(
-    4,
-    "15 Mar, 2019",
-    "Bruce Springsteen",
-    43,
-    43,
-    43,
-    "Long Branch, NJ",
-    "VISA ⠀•••• 5919",
-    212.79
-  ),
-];
-
-export default function OrderBuyer() {
   const navigate = useNavigate();
+  const [orders, setOrders] = React.useState([]);
+  const [error, setErrors] = React.useState({});
+  const id = localStorage.getItem("userid");
+  React.useEffect(() => {
+    axios
+      .post("/api/food/getOrders", { id: id, role: "buyer" })
+      .then((res) => {
+        setOrders(res.data);
+      })
+      .catch((err) => {
+        setErrors(err.response);
+      });
+  }, [id]);
 
   return (
     <Container>
       <Button
         variant="contained"
         onClick={() => {
-          navigate("/vendor/");
+          navigate("/buyer/");
         }}
       >
         Back
@@ -118,6 +59,8 @@ export default function OrderBuyer() {
         <Typography component="h1" variant="h5">
           Orders
         </Typography>
+        {error.display && <Alert color="error">{error.display}</Alert>}
+
         <Table>
           <TableHead>
             <TableRow>
@@ -133,15 +76,19 @@ export default function OrderBuyer() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.placedTime}</TableCell>
-                <TableCell>{row.vendorName}</TableCell>
-                <TableCell>{row.foodItem}</TableCell>
+            {orders.map((row, index) => (
+              <TableRow key={index}>
+                <TableCell>{moment(row.placedTime).format("LT")}</TableCell>
+                <TableCell>vendor name</TableCell>
+                <TableCell>food item</TableCell>
                 <TableCell>{row.quantity}</TableCell>
-                <TableCell>{row.addOns}</TableCell>
-                <TableCell>{row.cost}</TableCell>
-                <TableCell>{row.rating}</TableCell>
+                <TableCell>
+                  {row.addOns.map((addOn, index) => (
+                    <li key="index">{addOn.label}</li>
+                  ))}
+                </TableCell>
+                <TableCell>{row.price}</TableCell>
+                <TableCell>rating</TableCell>
                 <TableCell align="right">{row.status}</TableCell>
               </TableRow>
             ))}

@@ -123,12 +123,11 @@ router.get("/displayFood", (req, res) => {
 });
 
 router.post("/placeOrder", (req, res) => {
-  async () => {
-    const user = await User.findOne({ _id: ObjectId(req.body.buyerID) });
-    const buyer = await Buyer.findOne({ email: user.email });
-
-    if (parseInt(req.body.price <= buyer.wallet)) {
-      buyer.wallet = buyer.wallet - parseInt(req.body.price);
+  console.log(req.body);
+  Buyer.findOne({ email: req.body.email }).then((buyer) => {
+    if (req.body.price <= buyer.wallet) {
+      console.log(req.body.price);
+      buyer.wallet = buyer.wallet - req.body.price;
       buyer
         .save()
         .then((buyer) => res.json(buyer))
@@ -142,24 +141,32 @@ router.post("/placeOrder", (req, res) => {
       foodId: req.body.foodId,
       vendorID: req.body.vendorID,
       addOns: req.body.addOns,
+      placedTime: Date.now(),
       status: 0,
+      price: req.body.price,
     });
 
     console.log(newOrder);
     newOrder.save().catch((err) => console.log(err));
-  };
+  });
 });
 
 router.post("/getOrders", (req, res) => {
   if (req.body.role == "buyer") {
-    Order.findAll({ buyerId: req.body.id }).then((order) => {
+    Order.find({ buyerId: req.body.id }).then((order) => {
+      if (!order) {
+        return res.status(400).json({ display: "No orders to display" });
+      }
+      return res.json(order);
+    });
+  } else if (req.body.role == "vendor") {
+    Order.find({ vendorID: req.body.id }).then((order) => {
       if (!order) {
         return res.status(400).json({ display: "No orders to display" });
       }
       return res.json(order);
     });
   }
-  // write for vendor
 });
 
 router.post("/stageChange", (req, res) => {

@@ -80,7 +80,7 @@ export default function BuyerDashboard() {
       )
       .map((card) => (
         <Grid item key={card._id} xs={12} sm={6} md={3}>
-          <ItemCard card={card} />
+          <ItemCard card={card} userDetails={userDetails} />
         </Grid>
       ));
   };
@@ -119,19 +119,17 @@ export default function BuyerDashboard() {
                 <Button
                   variant="outlined"
                   onClick={() => {
-                    navigate("/profile");
+                    navigate("/order-buyer");
                   }}
                 >
                   My Profile
                 </Button>
               </Grid>
 
-              {userDetails.wallet && (
-                <Wallet
-                  userDetails={userDetails}
-                  setUserDetails={setUserDetails}
-                />
-              )}
+              <Wallet
+                userDetails={userDetails}
+                setUserDetails={setUserDetails}
+              />
               <Grid sx={{ paddingTop: 5 }}>
                 <Typography variant="h4">Favourites</Typography>
                 <Grid container spacing={4}>

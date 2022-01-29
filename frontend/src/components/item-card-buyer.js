@@ -17,8 +17,13 @@ import { FormLabel } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import moment from "moment";
 
-export default function ItemCard({ card }) {
+export default function ItemCard({ card, userDetails }) {
   const navigate = useNavigate();
+  // const [time, setTime] = React.useState(Date.now());
+  //
+  // React.useEffect(() => {
+  // setTime(Date.now());
+  // }, [Date.now()]);
   const [addOns, setAddOns] = React.useState(
     card.addOns.map((addOn) => {
       return { value: addOn.price, label: addOn.name };
@@ -26,13 +31,12 @@ export default function ItemCard({ card }) {
   );
   const [quantity, setQuantity] = React.useState(0);
   const [error, setError] = React.useState({});
-
   const buyItem = () => {
     if (quantity > 0) {
       const totalPrice =
         card.price +
         addOns.reduce((acc, addOn) => {
-          return acc + addOn.value;
+          return acc + parseInt(addOn.value);
         }, 0);
 
       const newOrder = {
@@ -42,7 +46,7 @@ export default function ItemCard({ card }) {
         addOns: addOns,
         status: 0,
         price: totalPrice,
-        buyerID: localStorage.getItem("userId"),
+        email: userDetails.email,
       };
       axios
         .post("/api/food/placeOrder", newOrder)
@@ -121,9 +125,18 @@ export default function ItemCard({ card }) {
             <Select isMulti options={addOns} />
           </>
         )}
-        <Button variant="contained" onClick={() => buyItem()}>
-          Buy
-        </Button>
+        {/* {moment(card.vendorOpenTime) */}
+        {/* .format("LT") */}
+        {/* .isBefore(moment(time).format("LT")) ? ( */}
+        {2 > 1 ? (
+          <Button variant="contained" onClick={() => buyItem()}>
+            Buy
+          </Button>
+        ) : (
+          <Button variant="contained" disabled onClick={() => buyItem()}>
+            Buy
+          </Button>
+        )}
       </Grid>
     </>
   );
