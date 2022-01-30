@@ -127,10 +127,7 @@ router.post("/placeOrder", (req, res) => {
   Buyer.findOne({ email: req.body.email }).then((buyer) => {
     if (req.body.price <= buyer.wallet) {
       buyer.wallet = buyer.wallet - req.body.price;
-      buyer
-        .save()
-        .then((buyer) => res.json(buyer))
-        .catch((err) => res.status(400).json(err));
+      buyer.save().catch((err) => res.status(400).json(err));
     } else {
       return res.status(400).json({ wallet: "Insufficient balance" });
     }
@@ -239,9 +236,9 @@ router.post("/getOrders", (req, res) => {
 });
 
 // router.post("/stats", (req, res) => {
-  // Food.find({ vendorID: req.body.id }).then((food) => {
-    // }
-  // });
+// Food.find({ vendorID: req.body.id }).then((food) => {
+// }
+// });
 // });
 
 router.post("/toggleFav", (req, res) => {
