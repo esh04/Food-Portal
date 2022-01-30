@@ -124,10 +124,8 @@ router.get("/displayFood", (req, res) => {
 });
 
 router.post("/placeOrder", (req, res) => {
-  console.log("bodddyyy", req.body);
   Buyer.findOne({ email: req.body.email }).then((buyer) => {
     if (req.body.price <= buyer.wallet) {
-      console.log(req.body.price);
       buyer.wallet = buyer.wallet - req.body.price;
       buyer
         .save()
@@ -146,29 +144,124 @@ router.post("/placeOrder", (req, res) => {
       price: req.body.price,
       buyerID: req.body.buyerID,
     });
+    newOrder
+      .save()
+      .then(() => res.json(buyer.wallet))
+      .catch((err) => console.log(err));
+  });
+});
 
-    console.log(newOrder);
-    newOrder.save().catch((err) => console.log(err));
+router.post("/changeStatus", (req, res) => {
+  Order.findOne({ _id: ObjectId(req.body.id) }).then((order) => {
+    if (!order) {
+      return res.status(400).json({ display: "No orders to display" });
+    } else {
+      if (req.body.rejected) {
+        order.status = 5;
+        console.log(order.status);
+        order
+          .save()
+          .then(() => res.json(order.status))
+          .catch((err) => res.status(400).json(err));
+      }
+      if (req.body.pickup) {
+        order.status = 4;
+        order
+          .save()
+          .then(() => res.json(order.status))
+
+          .catch((err) => res.status(400).json(err));
+      }
+      if (order.status < 4) {
+        order.status = order.status + 1;
+        order
+          .save()
+          .then(() => res.json(order.status))
+          .catch((err) => res.status(400).json(err));
+      }
+    }
   });
 });
 
 router.post("/getOrders", (req, res) => {
   if (req.body.role == "buyer") {
-    Order.find({ buyerId: req.body.id }).then((order) => {
-      if (!order) {
+    Order.find({ buyerId: req.body.id }).then(async (orders) => {
+      if (!orders) {
         return res.status(400).json({ display: "No orders to display" });
       }
-      return res.json(order);
+
+      let tempOrders = [];
+
+      await Promise.all(
+        orders.map(async (order, index) => {
+          const food = await Food.findOne({ _id: ObjectId(order.foodId) });
+          const user = await User.findOne({ _id: ObjectId(order.vendorID) });
+          const vendor = await Vendor.findOne({ email: user.email });
+          tempOrders.push({
+            id: order._id,
+            quantity: order.quantity,
+            addOns: order.addOns,
+            placedTime: order.placedTime,
+            status: order.status,
+            price: order.price,
+            rating: food.rating,
+            vendorName: vendor.managerName,
+            foodItem: food.name,
+          });
+        })
+      );
+      return res.json(tempOrders);
     });
   } else if (req.body.role == "vendor") {
-    Order.find({ vendorID: req.body.id }).then((order) => {
-      if (!order) {
+    Order.find({ vendorID: req.body.id }).then(async (orders) => {
+      if (!orders) {
         return res.status(400).json({ display: "No orders to display" });
       }
-      console.log(order);
-      return res.json(order);
+
+      let tempOrders = [];
+
+      await Promise.all(
+        orders.map(async (order, index) => {
+          const food = await Food.findOne({ _id: ObjectId(order.foodId) });
+          tempOrders.push({
+            id: order._id,
+            quantity: order.quantity,
+            addOns: order.addOns,
+            placedTime: order.placedTime,
+            status: order.status,
+            foodItem: food.name,
+          });
+        })
+      );
+      return res.json(tempOrders);
     });
   }
+});
+
+// router.post("/stats", (req, res) => {
+  // Food.find({ vendorID: req.body.id }).then((food) => {
+    // }
+  // });
+// });
+
+router.post("/toggleFav", (req, res) => {
+  Buyer.findOne({ email: req.body.email }).then((buyer) => {
+    if (!buyer) {
+      return res.status(400).json({ buyer: "User doesn't exists" });
+    } else {
+      if (buyer.favedFoods.includes(req.body.foodId)) {
+        buyer.favFoods = buyer.favFoods.filter(function (item) {
+          return item !== req.body.foodId;
+        });
+      } else {
+        buyer.favFoods.push(req.body.foodId);
+      }
+      buyer
+        .save()
+        .then((buyer) => res.json(buyer))
+        .catch((err) => res.status(400).json(err));
+    }
+  });
 });
 
 module.exports = router;

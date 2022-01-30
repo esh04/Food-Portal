@@ -9,14 +9,13 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 
-export default function Wallet({ userDetails }) {
+export default function Wallet({ email, wallet, setWallet }) {
   const [walletAdd, setWalletAdd] = React.useState(0);
-  const [wallet, setWallet] = React.useState(userDetails.wallet);
 
   const addMoney = (event) => {
     axios
       .post("/api/users/addMoney", {
-        email: userDetails.email,
+        email: email,
         amount: walletAdd,
       })
       .then((res) => {

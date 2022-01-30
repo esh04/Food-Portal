@@ -1,7 +1,9 @@
 import * as React from "react";
 import Grid from "@mui/material/Grid";
 import Select from "react-select";
+import { Select as MSelect } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
+import MenuItem from "@mui/material/MenuItem";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import { FormLabel } from "@mui/material";
@@ -43,7 +45,16 @@ export default function Filters({ filter, setFilter, options }) {
             </Grid>
             <Grid sx={{ paddingLeft: 2 }}>
               <FormLabel>Shop Names</FormLabel>
-              <Select isMulti options={shopNames} />
+              <Select
+                isMulti
+                options={shopNames}
+                onChange={(e) => {
+                  setFilter({
+                    ...filter,
+                    shopNames: e.map((item) => item.value),
+                  });
+                }}
+              />
             </Grid>
             <Grid sx={{ paddingLeft: 2 }}>
               <FormControlLabel
@@ -108,6 +119,28 @@ export default function Filters({ filter, setFilter, options }) {
                 value={filter.min}
                 onChange={(e) => setFilter({ ...filter, min: e.target.value })}
               />
+            </Grid>
+            <Grid sx={{ paddingLeft: 2 }}>
+              <MSelect
+                value={filter.choice}
+                onChange={(event) => {
+                  setFilter({ ...filter, choice: event.target.value });
+                }}
+              >
+                <MenuItem value="price">Price</MenuItem>
+                <MenuItem value="rating">Rating</MenuItem>
+              </MSelect>
+            </Grid>
+            <Grid sx={{ paddingLeft: 2 }}>
+              <MSelect
+                value={filter.asc}
+                onChange={(event) => {
+                  setFilter({ ...filter, asc: event.target.value });
+                }}
+              >
+                <MenuItem value="-1">Ascending</MenuItem>
+                <MenuItem value="1">Descending</MenuItem>
+              </MSelect>
             </Grid>
           </Grid>
         </Grid>

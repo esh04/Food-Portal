@@ -26,6 +26,10 @@ const FoodSchema = new Schema({
   vendorID: {
     type: String,
   },
+  numberOfOrders: {
+    type: Number,
+    default: 0,
+  },
   // image: {
   //     type: String
   // },

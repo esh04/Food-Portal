@@ -218,4 +218,24 @@ router.post("/addMoney", (req, res) => {
   });
 });
 
+router.post("/toggleFav", (req, res) => {
+  Buyer.findOne({ email: req.body.email }).then((buyer) => {
+    if (!buyer) {
+      return res.status(400).json({ buyer: "User doesn't exists" });
+    } else {
+      if (buyer.favFoods.includes(req.body.foodId)) {
+        buyer.favFoods = buyer.favFoods.filter(function (item) {
+          return item !== req.body.foodId;
+        });
+      } else {
+        buyer.favFoods.push(req.body.foodId);
+      }
+      buyer
+        .save()
+        .then((buyer) => res.json(buyer))
+        .catch((err) => res.status(400).json(err));
+    }
+  });
+});
+
 module.exports = router;

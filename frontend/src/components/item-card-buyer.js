@@ -1,30 +1,29 @@
 import * as React from "react";
-import { useNavigate } from "react-router";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
+import ToggleButton from "@mui/material/ToggleButton";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
 import Select from "react-select";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
-import { FormLabel } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import moment from "moment";
 
-export default function ItemCard({ card, userDetails }) {
+export default function ItemCard({
+  card,
+  email,
+  wallet,
+  setWallet,
+  timeComparer,
+}) {
   const id = localStorage.getItem("userid");
-  const navigate = useNavigate();
-  // const [time, setTime] = React.useState(Date.now());
-  //
-  // React.useEffect(() => {
-  // setTime(Date.now());
-  // }, [Date.now()]);
+  const [selectedAddOns, setSelectedAddOns] = React.useState([]);
+  const [price, setPrice] = React.useState(card.price);
   const [addOns, setAddOns] = React.useState(
     card.addOns.map((addOn) => {
       return { value: addOn.price, label: addOn.name };
@@ -34,25 +33,24 @@ export default function ItemCard({ card, userDetails }) {
   const [error, setError] = React.useState({});
   const buyItem = () => {
     if (quantity > 0) {
-      const totalPrice =
-        card.price +
-        addOns.reduce((acc, addOn) => {
-          return acc + parseInt(addOn.value);
-        }, 0);
-
+      if (price * quantity > wallet) {
+        setError({ wallet: "Insufficient balance" });
+        return;
+      }
       const newOrder = {
         quantity: quantity,
         foodId: card._id,
         vendorID: card.vendorID,
-        addOns: addOns,
+        addOns: selectedAddOns,
         status: 0,
-        price: totalPrice,
-        email: userDetails.email,
+        price: price * quantity,
+        email: email,
         buyerID: id,
       };
       axios
         .post("/api/food/placeOrder", newOrder)
         .then((res) => {
+          setWallet(res.data);
           setError({ success: "Order Placed Successfully" });
         })
         .catch((err) => {
@@ -67,29 +65,32 @@ export default function ItemCard({ card, userDetails }) {
       {error.success && <Alert color="success">{error.success}</Alert>}
 
       <Card>
-        {/* <CardMedia
-                    component="img"
-                    sx={{
-                      // 16:9
-                      pt: "56.25%",
-                    }}
-                    image="https://source.unsplash.com/random"
-                    alt="random"
-                  /> */}
         <CardContent>
+          {timeComparer(card) == 1 && (
+            <Typography variant="subtitle1" style={{ color: "grey" }}>
+              Canteen Closed
+            </Typography>
+          )}
+
           <Typography gutterBottom variant="h5" component="h2">
             {card.name}
           </Typography>
-          <Typography>Price: Rs {card.price}</Typography>
-          <Typography>Vendor: {card.vendorName}</Typography>
-          <Typography>Shop Name: {card.vendorShopName}</Typography>
           <Typography>
-            Open Time: {moment(card.vendorOpenTime).format("LT")}
+            <b>Price:</b> Rs {price}
           </Typography>
           <Typography>
-            Close Time: {moment(card.vendorCloseTime).format("LT")}
+            <b>Vendor:</b> {card.vendorName}
           </Typography>
           <Typography>
+            <b>Shop Name:</b> {card.vendorShopName}
+          </Typography>
+          <Typography>
+            <b>Open Time:</b> {moment(card.vendorOpenTime).format("LT")}
+          </Typography>
+          <Typography>
+            <b>Close Time:</b> {moment(card.vendorCloseTime).format("LT")}
+          </Typography>
+          <Typography style={{ color: card.veg === "veg" ? "green" : "red" }}>
             {card.veg === "veg" ? "Vegeterian" : "Non-Vegeterian"}
           </Typography>
           {card.tags?.length > 0 && (
@@ -114,23 +115,39 @@ export default function ItemCard({ card, userDetails }) {
                 type="number"
                 id="quantity"
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                onChange={(e) => {
+                  setQuantity(e.target.value);
+                }}
               />
             </Grid>
           </Grid>
         </CardActions>
+        {/* <ToggleButton value="left" aria-label="left aligned">
+          <StarIcon />
+        </ToggleButton> */}
       </Card>
       <Grid sx={{ paddingTop: 2 }}>
         {card.addOns?.length > 0 && (
           <>
             <Typography>Addons</Typography>
-            <Select isMulti options={addOns} />
+            <Select
+              isMulti
+              options={addOns}
+              onChange={(e) => {
+                setSelectedAddOns(e);
+                setPrice(
+                  card.price +
+                    e
+                      .map((item) => item.value)
+                      .reduce((acc, addOn) => {
+                        return acc + parseInt(addOn);
+                      }, 0)
+                );
+              }}
+            />
           </>
         )}
-        {/* {moment(card.vendorOpenTime) */}
-        {/* .format("LT") */}
-        {/* .isBefore(moment(time).format("LT")) ? ( */}
-        {2 > 1 ? (
+        {timeComparer(card) == -1 ? (
           <Button variant="contained" onClick={() => buyItem()}>
             Buy
           </Button>

@@ -12,30 +12,52 @@ import Alert from "@mui/material/Alert";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import Rating from '@mui/material/Rating';
+
+const status = {
+  0: "Placed",
+  1: "Accepted",
+  2: "Cooking",
+  3: "Ready for Pickup",
+  4: "Completed",
+  5: "Rejected",
+};
 
 export default function OrderBuyer({ userDetails }) {
-  const status = {
-    0: "Placed",
-    1: "Accepted",
-    2: "Cooking",
-    3: "Ready for Pickup",
-    4: "Completed",
-    5: "Rejected",
-  };
   const navigate = useNavigate();
   const [orders, setOrders] = React.useState([]);
   const [error, setErrors] = React.useState({});
+  const [rating, setRating] = React.useState(0);
   const id = localStorage.getItem("userid");
   React.useEffect(() => {
     axios
       .post("/api/food/getOrders", { id: id, role: "buyer" })
       .then((res) => {
+        console.log(res.data);
         setOrders(res.data);
       })
       .catch((err) => {
         setErrors(err.response);
       });
   }, [id]);
+
+  const onPickup = (order) => {
+    if (order.status < 4) {
+      axios
+        .post("/api/food/changeStatus", { id: order.id, pickup: true })
+        .then((res) => {
+          let index = orders.findIndex((orderItem) => order.id == orderItem.id);
+          setOrders([
+            ...orders.slice(0, index),
+            { ...orders[index], status: orders[index].status + 1 },
+            ...orders.slice(index + 1),
+          ]);
+        })
+        .catch((err) => {
+          setErrors(err.response);
+        });
+    }
+  };
 
   return (
     <Container>
@@ -78,17 +100,37 @@ export default function OrderBuyer({ userDetails }) {
             {orders.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{moment(row.placedTime).format("LT")}</TableCell>
-                <TableCell>vendor name</TableCell>
-                <TableCell>food item</TableCell>
+                <TableCell>{row.vendorName}</TableCell>
+                <TableCell>{row.foodItem}</TableCell>
                 <TableCell>{row.quantity}</TableCell>
                 <TableCell>
-                  {row.addOns.map((addOn, index) => (
-                    <li key="index">{addOn.label}</li>
+                  {row.addOns.map((addOn, i) => (
+                    <li key={i}>{addOn.label}</li>
                   ))}
                 </TableCell>
                 <TableCell>{row.price}</TableCell>
-                <TableCell>rating</TableCell>
-                <TableCell align="right">{row.status}</TableCell>
+                <TableCell>{row.rating}
+                
+                { (row.status == 4) &&
+                <Rating
+                  name="simple-controlled"
+                  value={rating}
+                  onChange={(event, newValue) => {
+                    setRating(newValue);
+                  }}
+                />
+                }
+                
+                </TableCell>
+                <TableCell align="right">{status[row.status]}</TableCell>
+                <Button
+                  variant="contained"
+                  onClick={() => onPickup(row)}
+                  disabled={row.status !== 3}
+                >
+                  Ready for Pickup
+                </Button>
+                
               </TableRow>
             ))}
           </TableBody>

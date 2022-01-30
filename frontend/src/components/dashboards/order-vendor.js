@@ -13,16 +13,16 @@ import axios from "axios";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 
+const status = {
+  0: "Placed",
+  1: "Accepted",
+  2: "Cooking",
+  3: "Ready for Pickup",
+  4: "Completed",
+  5: "Rejected",
+};
+
 export default function OrderVendor() {
-  const nextStage = () => {};
-  const status = {
-    0: "Placed",
-    1: "Accepted",
-    2: "Cooking",
-    3: "Ready for Pickup",
-    4: "Completed",
-    5: "Rejected",
-  };
   const navigate = useNavigate();
   const [orders, setOrders] = React.useState([]);
   const [error, setErrors] = React.useState({});
@@ -32,12 +32,29 @@ export default function OrderVendor() {
       .post("/api/food/getOrders", { id: id, role: "vendor" })
       .then((res) => {
         setOrders(res.data);
-        console.log(res.data);
       })
       .catch((err) => {
         setErrors(err.response);
       });
   }, [id]);
+
+  const nextStage = (order, rejected) => {
+    if (order.status < 4) {
+      axios
+        .post("/api/food/changeStatus", { id: order.id, rejected: rejected })
+        .then((res) => {
+          let index = orders.findIndex((orderItem) => order.id == orderItem.id);
+          setOrders([
+            ...orders.slice(0, index),
+            { ...orders[index], status: orders[index].status + 1 },
+            ...orders.slice(index + 1),
+          ]);
+        })
+        .catch((err) => {
+          setErrors(err.response);
+        });
+    }
+  };
 
   return (
     <Container>
@@ -69,29 +86,47 @@ export default function OrderVendor() {
               <TableCell>Food Item</TableCell>
               <TableCell>Quantity</TableCell>
               <TableCell>Add Ons</TableCell>
-              <TableCell align="right">Status</TableCell>
+              <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {orders.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{moment(row.placedTime).format("LT")}</TableCell>
-                <TableCell>food item</TableCell>
+                <TableCell>{row.foodItem}</TableCell>
                 <TableCell>{row.quantity}</TableCell>
                 <TableCell>
-                  {row.addOns.map((addOn, index) => (
-                    <li key="index">{addOn.label}</li>
+                  {row.addOns.map((addOn, i) => (
+                    <li key={i}>{addOn.label}</li>
                   ))}
                 </TableCell>
-                <TableCell align="right">{row.status}</TableCell>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    nextStage();
-                  }}
-                >
-                  Move To Next Stage
-                </Button>
+                <TableCell>{status[row.status]}</TableCell>
+                {row.status !== 5 ? (
+                  <>
+                    <Button
+                      variant="contained"
+                      disabled={row.status > 2}
+                      onClick={() => {
+                        nextStage(row, false);
+                      }}
+                    >
+                      Move To Next Stage
+                    </Button>
+                    {row.status == 0 && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                          nextStage(row, true);
+                        }}
+                      >
+                        Reject
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  "Rejected"
+                )}
               </TableRow>
             ))}
           </TableBody>

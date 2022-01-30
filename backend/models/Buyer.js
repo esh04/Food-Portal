@@ -26,6 +26,9 @@ const BuyerSchema = new Schema({
     type: Number,
     default: 0,
   },
+  favFoods: {
+    type: Array,
+  },
 });
 
 module.exports = Buyer = mongoose.model("buyers", BuyerSchema);

@@ -17,13 +17,14 @@ export default function BuyerDashboard() {
   const [userDetails, setUserDetails] = React.useState({});
   const [foodItems, setFoodItems] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [wallet, setWallet] = React.useState(0);
   const [options, setOptions] = React.useState({ tags: [], shopNames: [] });
   const [filter, setFilter] = React.useState({
     search: "",
     veg: ["veg", "nonveg"],
     tags: [],
     shopNames: [],
-    max: 999,
+    max: 1000,
     min: 0,
     choice: "price",
     asc: "1",
@@ -34,6 +35,7 @@ export default function BuyerDashboard() {
       .post("/api/users/getUser", { id: id })
       .then((res) => {
         setUserDetails(res.data.details);
+        setWallet(res.data.details.wallet);
       })
       .catch((err) => {
         console.log(err);
@@ -43,20 +45,35 @@ export default function BuyerDashboard() {
       .get("/api/food/displayFood")
       .then((res) => {
         let tempTags = [];
+        let tempShopNames = [];
         setFoodItems(res.data);
         res.data.forEach((foodItem, index) => {
           let tempArray = foodItem.tags.filter(
             (item) => !tempTags.find((tag) => tag == item)
           );
+          tempShopNames.push(foodItem.vendorShopName);
           tempTags.push(...tempArray);
         });
-        setOptions({ tags: tempTags, shopNames: [] });
+        tempShopNames = [...new Set(tempShopNames)];
+        setOptions({ tags: tempTags, shopNames: tempShopNames });
         setLoading(false);
       })
       .catch((err) => {
         console.log(err);
       });
   }, [id]);
+
+  const timeComparer = (a, b) => {
+    if (
+      new Date(a.vendorOpenTime).toLocaleTimeString("it-IT") <
+        new Date().toLocaleTimeString("it-IT") &&
+      new Date().toLocaleTimeString("it-IT") <
+        new Date(a.vendorCloseTime).toLocaleTimeString("it-IT")
+    ) {
+      return -1;
+    }
+    return 1;
+  };
 
   const showFoodItems = () => {
     const fuse = new Fuse(foodItems, { keys: ["name"] });
@@ -70,17 +87,26 @@ export default function BuyerDashboard() {
         (item1, item2) =>
           (item1[filter.choice] - item2[filter.choice]) * parseInt(filter.asc)
       )
+      .sort(timeComparer)
       .filter(
         (item) =>
           (!filter.max || item.price <= filter.max) &&
           item.price >= filter.min &&
           filter.veg.includes(item.veg) &&
           (filter.tags.length === 0 ||
-            filter.tags.some((r) => item.tags.includes(r)))
+            filter.tags.some((r) => item.tags.includes(r))) &&
+          (filter.shopNames.length === 0 ||
+            filter.shopNames.includes(item.vendorShopName))
       )
       .map((card) => (
         <Grid item key={card._id} xs={12} sm={6} md={3}>
-          <ItemCard card={card} userDetails={userDetails} />
+          <ItemCard
+            card={card}
+            email={userDetails.email}
+            wallet={wallet}
+            setWallet={setWallet}
+            timeComparer={timeComparer}
+          />
         </Grid>
       ));
   };
@@ -126,7 +152,7 @@ export default function BuyerDashboard() {
                 <Button
                   variant="outlined"
                   onClick={() => {
-                    navigate("/buyer");
+                    navigate("/profile");
                   }}
                 >
                   My Profile
@@ -134,8 +160,9 @@ export default function BuyerDashboard() {
               </Grid>
 
               <Wallet
-                userDetails={userDetails}
-                setUserDetails={setUserDetails}
+                email={userDetails.email}
+                wallet={wallet}
+                setWallet={setWallet}
               />
               <Grid sx={{ paddingTop: 5 }}>
                 <Typography variant="h4">Favourites</Typography>
