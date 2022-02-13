@@ -16,6 +16,7 @@ export default function BuyerDashboard() {
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = React.useState({});
   const [foodItems, setFoodItems] = React.useState([]);
+  const [favItems, setFavItems] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [wallet, setWallet] = React.useState(0);
   const [options, setOptions] = React.useState({ tags: [], shopNames: [] });
@@ -47,6 +48,11 @@ export default function BuyerDashboard() {
         let tempTags = [];
         let tempShopNames = [];
         setFoodItems(res.data);
+        setFavItems(
+          res.data.filter(function (item) {
+            return userDetails.favFoods.includes(res.data._id);
+          })
+        );
         res.data.forEach((foodItem, index) => {
           let tempArray = foodItem.tags.filter(
             (item) => !tempTags.find((tag) => tag == item)
@@ -167,11 +173,11 @@ export default function BuyerDashboard() {
               <Grid sx={{ paddingTop: 5 }}>
                 <Typography variant="h4">Favourites</Typography>
                 <Grid container spacing={4}>
-                  {/* {cards.map((card) => (
-                  <Grid item key={card} sx={{ padding: 1 }}>
-                    <ItemCard card={card} options={options} />
-                  </Grid>
-                ))} */}
+                  {favItems.map((card) => (
+                    <Grid item key={card} sx={{ padding: 1 }}>
+                      <ItemCard card={card} options={options} />
+                    </Grid>
+                  ))}
                 </Grid>
               </Grid>
             </Grid>

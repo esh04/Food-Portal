@@ -31,6 +31,7 @@ router.post("/addFood", (req, res) => {
           addOns: req.body.addOns,
           tags: req.body.tags,
           vendorID: req.body.vendorID,
+          numberOfOrders: 0,
         });
 
         newFood
@@ -131,6 +132,13 @@ router.post("/placeOrder", (req, res) => {
     } else {
       return res.status(400).json({ wallet: "Insufficient balance" });
     }
+    Food.findOne(
+      { _id: ObjectId(req.body.foodId) }.then((food) => {
+        food.numberOfOrders += 1;
+        food.save().catch((err) => console.log(err));
+      })
+    );
+
     const newOrder = new Order({
       quantity: req.body.quantity,
       foodId: req.body.foodId,

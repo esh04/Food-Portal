@@ -59,6 +59,7 @@ router.post("/register", (req, res) => {
           contact: req.body.contact,
           age: req.body.age,
           wallet: 0,
+          favFoods: [],
         });
 
         newBuyer.save().catch((err) => console.log(err));

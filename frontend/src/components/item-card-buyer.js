@@ -71,7 +71,7 @@ export default function ItemCard({
               Canteen Closed
             </Typography>
           )}
-
+          <ToggleButton value="left" aria-label="left aligned"></ToggleButton>
           <Typography gutterBottom variant="h5" component="h2">
             {card.name}
           </Typography>
