@@ -16,13 +16,7 @@ app.use(
 );
 
 app.use(bodyParser.json());
-app.use(
-  cors({
-    origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
+app.use(cors());
 // DB Config
 const db = require("./config/keys").mongoURI;
 

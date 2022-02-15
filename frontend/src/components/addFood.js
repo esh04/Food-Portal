@@ -37,7 +37,7 @@ export default function AddFood(prop) {
       vendorID: id,
     };
     axios
-      .post("http://localhost:5000/api/food/addFood", newFoodItem)
+      .post("/api/food/addFood", newFoodItem)
       .then((res) => {
         tags = [];
         addOns = [];
