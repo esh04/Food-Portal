@@ -1,6 +1,20 @@
 # Food-Portal
 
-## Setup and Running
+## To deploy
+
+To Install docker refer:
+https://docs.docker.com/engine/install/ubuntu/
+
+Install docker-compose
+`sudo apt-get install docker-compose`
+
+To deploy the app, run on terminal
+`docker-compose up -d`
+
+To terminate deployment:
+`docker-compose down`
+
+## Local Setup and Running
 
 - For Backend:
 
