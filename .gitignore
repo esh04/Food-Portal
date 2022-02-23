@@ -126,4 +126,7 @@ bundles/
 vendor/pkg/
 pyenv
 Vagrantfile
+
+# secret
+keys.js
 /data
