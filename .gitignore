@@ -128,5 +128,5 @@ pyenv
 Vagrantfile
 
 # secret
-keys.js
+backend/config/keys.js
 /data
