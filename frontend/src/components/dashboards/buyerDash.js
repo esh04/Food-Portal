@@ -16,7 +16,6 @@ export default function BuyerDashboard() {
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = React.useState({});
   const [foodItems, setFoodItems] = React.useState([]);
-  const [favItems, setFavItems] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [wallet, setWallet] = React.useState(0);
   const [options, setOptions] = React.useState({ tags: [], shopNames: [] });
@@ -30,12 +29,14 @@ export default function BuyerDashboard() {
     choice: "price",
     asc: "1",
   });
+  const [favFoods, setFavFoods] = React.useState([]);
 
   React.useEffect(() => {
     axios
       .post("/api/users/getUser", { id: id })
       .then((res) => {
         setUserDetails(res.data.details);
+        setFavFoods(res.data.details.favFoods);
         setWallet(res.data.details.wallet);
       })
       .catch((err) => {
@@ -48,11 +49,6 @@ export default function BuyerDashboard() {
         let tempTags = [];
         let tempShopNames = [];
         setFoodItems(res.data);
-        setFavItems(
-          res.data.filter(function (item) {
-            return userDetails.favFoods.includes(res.data._id);
-          })
-        );
         res.data.forEach((foodItem, index) => {
           let tempArray = foodItem.tags.filter(
             (item) => !tempTags.find((tag) => tag == item)
@@ -107,16 +103,19 @@ export default function BuyerDashboard() {
       .map((card) => (
         <Grid item key={card._id} xs={12} sm={6} md={3}>
           <ItemCard
-            card={card}
+            cardDeatils={card}
             email={userDetails.email}
             wallet={wallet}
             setWallet={setWallet}
+            favFoods={favFoods}
+            setFavFoods={setFavFoods}
             timeComparer={timeComparer}
           />
         </Grid>
       ));
   };
 
+  console.log(favFoods);
   return (
     <>
       {loading ? (
@@ -173,10 +172,18 @@ export default function BuyerDashboard() {
               <Grid sx={{ paddingTop: 5 }}>
                 <Typography variant="h4">Favourites</Typography>
                 <Grid container spacing={4}>
-                  {favItems.map((card) => (
-                    <Grid item key={card} sx={{ padding: 1 }}>
-                      <ItemCard card={card} options={options} />
-                    </Grid>
+                  {favFoods.map((card) => (
+                    <ItemCard
+                      key={card}
+                      cardDeatils={{ _id: card }}
+                      email={userDetails.email}
+                      wallet={wallet}
+                      setWallet={setWallet}
+                      favFoods={favFoods}
+                      setFavFoods={setFavFoods}
+                      timeComparer={timeComparer}
+                      fav={true}
+                    />
                   ))}
                 </Grid>
               </Grid>

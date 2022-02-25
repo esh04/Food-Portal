@@ -15,22 +15,27 @@ import Alert from "@mui/material/Alert";
 import moment from "moment";
 
 export default function ItemCard({
-  card,
+  cardDeatils = {},
   email,
   wallet,
   setWallet,
+  favFoods,
+  setFavFoods,
   timeComparer,
+  fav = false,
 }) {
   const id = localStorage.getItem("userid");
+  const [card, setCard] = React.useState(cardDeatils);
   const [selectedAddOns, setSelectedAddOns] = React.useState([]);
-  const [price, setPrice] = React.useState(card.price);
+  const [price, setPrice] = React.useState(card?.price);
   const [addOns, setAddOns] = React.useState(
-    card.addOns.map((addOn) => {
+    card?.addOns?.map((addOn) => {
       return { value: addOn.price, label: addOn.name };
     })
   );
   const [quantity, setQuantity] = React.useState(0);
   const [error, setError] = React.useState({});
+
   const buyItem = () => {
     if (quantity > 0) {
       if (price * quantity > wallet) {
@@ -39,8 +44,8 @@ export default function ItemCard({
       }
       const newOrder = {
         quantity: quantity,
-        foodId: card._id,
-        vendorID: card.vendorID,
+        foodId: card?._id,
+        vendorID: card?.vendorID,
         addOns: selectedAddOns,
         status: 0,
         price: price * quantity,
@@ -58,6 +63,32 @@ export default function ItemCard({
         });
     } else setError({ quantity: "Invalid Quantity" });
   };
+
+  const onToggle = () => {
+    axios
+      .post("/api/users/toggleFav", { email: email, foodId: card?._id })
+      .then((res) => {
+        setFavFoods(res.data);
+      })
+      .catch((err) => {
+        setError(err.response);
+      });
+  };
+
+  React.useEffect(() => {
+    if (fav) {
+      axios
+        .post("/api/food/getSingleFood", { foodId: cardDeatils?._id })
+        .then((res) => {
+          console.log(res.data);
+          setCard(res.data);
+        })
+        .catch((err) => {
+          setError(err.response);
+        });
+    }
+  }, []);
+
   return (
     <>
       {error.quantity && <Alert color="error">{error.quantity}</Alert>}
@@ -71,36 +102,36 @@ export default function ItemCard({
               Canteen Closed
             </Typography>
           )}
-          <ToggleButton value="left" aria-label="left aligned"></ToggleButton>
+
           <Typography gutterBottom variant="h5" component="h2">
-            {card.name}
+            {card?.name}
           </Typography>
           <Typography>
             <b>Price:</b> Rs {price}
           </Typography>
           <Typography>
-            <b>Vendor:</b> {card.vendorName}
+            <b>Vendor:</b> {card?.vendorName}
           </Typography>
           <Typography>
-            <b>Shop Name:</b> {card.vendorShopName}
+            <b>Shop Name:</b> {card?.vendorShopName}
           </Typography>
           <Typography>
-            <b>Open Time:</b> {moment(card.vendorOpenTime).format("LT")}
+            <b>Open Time:</b> {moment(card?.vendorOpenTime).format("LT")}
           </Typography>
           <Typography>
-            <b>Close Time:</b> {moment(card.vendorCloseTime).format("LT")}
+            <b>Close Time:</b> {moment(card?.vendorCloseTime).format("LT")}
           </Typography>
-          <Typography style={{ color: card.veg === "veg" ? "green" : "red" }}>
-            {card.veg === "veg" ? "Vegeterian" : "Non-Vegeterian"}
+          <Typography style={{ color: card?.veg === "veg" ? "green" : "red" }}>
+            {card?.veg === "veg" ? "Vegeterian" : "Non-Vegeterian"}
           </Typography>
-          {card.tags?.length > 0 && (
+          {card?.tags?.length > 0 && (
             <Typography>
               <br />
               <b>Tags:</b>
             </Typography>
           )}
-          {card.tags?.length > 0 &&
-            card.tags.map((tag, index) => (
+          {card?.tags?.length > 0 &&
+            card?.tags?.map((tag, index) => (
               <Typography key={index}>{tag}</Typography>
             ))}
         </CardContent>
@@ -122,12 +153,20 @@ export default function ItemCard({
             </Grid>
           </Grid>
         </CardActions>
-        {/* <ToggleButton value="left" aria-label="left aligned">
-          <StarIcon />
-        </ToggleButton> */}
+        <ToggleButton
+          value="fav"
+          selected={favFoods.includes(card?._id)}
+          onChange={onToggle}
+        >
+          {favFoods.includes(card?._id) ? (
+            <StarIcon color="info" />
+          ) : (
+            <StarBorderIcon color="info" />
+          )}
+        </ToggleButton>
       </Card>
       <Grid sx={{ paddingTop: 2 }}>
-        {card.addOns?.length > 0 && (
+        {card?.addOns?.length > 0 && (
           <>
             <Typography>Addons</Typography>
             <Select
@@ -136,7 +175,7 @@ export default function ItemCard({
               onChange={(e) => {
                 setSelectedAddOns(e);
                 setPrice(
-                  card.price +
+                  card?.price +
                     e
                       .map((item) => item.value)
                       .reduce((acc, addOn) => {

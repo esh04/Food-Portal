@@ -31,7 +31,6 @@ router.post("/addFood", (req, res) => {
           addOns: req.body.addOns,
           tags: req.body.tags,
           vendorID: req.body.vendorID,
-          numberOfOrders: 0,
         });
 
         newFood
@@ -82,11 +81,27 @@ router.post("/getFood", (req, res) => {
 });
 
 router.post("/getSingleFood", (req, res) => {
-  Food.findOne({ _id: req.body.foodId, vendorID: req.body.id }).then((food) => {
+  Food.findOne({ _id: req.body.foodId }).then(async (food) => {
     if (!food) {
       return res.status(400).json({ food: "Item doesn't exists" });
     } else {
-      return res.json(food);
+      const user = await User.findOne({ _id: ObjectId(food.vendorID) });
+      const vendor = await Vendor.findOne({ email: user.email });
+      const tempFood = {
+        _id: food._id,
+        name: food.name,
+        price: food.price,
+        rating: food.rating,
+        veg: food.veg,
+        addOns: food.addOns,
+        tags: food.tags,
+        vendorName: vendor.managerName,
+        vendorShopName: vendor.shopName,
+        vendorOpenTime: vendor.openTime,
+        vendorCloseTime: vendor.closeTime,
+        vendorID: user._id,
+      };
+      return res.json(tempFood);
     }
   });
 });
@@ -132,13 +147,6 @@ router.post("/placeOrder", (req, res) => {
     } else {
       return res.status(400).json({ wallet: "Insufficient balance" });
     }
-    Food.findOne(
-      { _id: ObjectId(req.body.foodId) }.then((food) => {
-        food.numberOfOrders += 1;
-        food.save().catch((err) => console.log(err));
-      })
-    );
-
     const newOrder = new Order({
       quantity: req.body.quantity,
       foodId: req.body.foodId,
@@ -243,29 +251,46 @@ router.post("/getOrders", (req, res) => {
   }
 });
 
-// router.post("/stats", (req, res) => {
-// Food.find({ vendorID: req.body.id }).then((food) => {
-// }
-// });
-// });
+router.post("/stats", (req, res) => {
+  let ordersPlaced = 0;
+  let pendingOrders = 0;
+  let completedOrders = 0;
+  var freq = {};
+  Order.find({ vendorID: req.body.id }).then(async (orders) => {
+    ordersPlaced = orders.length;
+    orders.forEach((order) => {
+      if (order.status < 4) pendingOrders++;
+      if (order.status == 4) completedOrders++;
 
-router.post("/toggleFav", (req, res) => {
-  Buyer.findOne({ email: req.body.email }).then((buyer) => {
-    if (!buyer) {
-      return res.status(400).json({ buyer: "User doesn't exists" });
-    } else {
-      if (buyer.favedFoods.includes(req.body.foodId)) {
-        buyer.favFoods = buyer.favFoods.filter(function (item) {
-          return item !== req.body.foodId;
-        });
-      } else {
-        buyer.favFoods.push(req.body.foodId);
-      }
-      buyer
-        .save()
-        .then((buyer) => res.json(buyer))
-        .catch((err) => res.status(400).json(err));
+      if (order.foodId in freq) freq[order.foodId] += 1;
+      else freq[order.foodId] = 1;
+    });
+
+    var sortable = [];
+    for (var key in freq) {
+      sortable.push([key, freq[key]]);
     }
+
+    sortable.sort(function (a, b) {
+      return b[1] - a[1];
+    });
+
+    sortable.slice(0, Math.min(4, sortable.length));
+
+    let foodItems = [];
+    await Promise.all(
+      sortable.map(async (id, index) => {
+        const food = await Food.findOne({ _id: ObjectId(id[0]) });
+        foodItems.push(food.name);
+      })
+    );
+
+    return res.json({
+      foodItems: foodItems,
+      ordersPlaced: ordersPlaced,
+      pendingOrders: pendingOrders,
+      completedOrders: completedOrders,
+    });
   });
 });
 

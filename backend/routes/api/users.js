@@ -233,7 +233,7 @@ router.post("/toggleFav", (req, res) => {
       }
       buyer
         .save()
-        .then((buyer) => res.json(buyer))
+        .then((buyer) => res.json(buyer.favFoods))
         .catch((err) => res.status(400).json(err));
     }
   });
